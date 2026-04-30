@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مركز العراب لطب الأسنان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9A84C;--gold2:#E8D5A3;--gold3:#A07828;--gold4:#F5EDD4;
+  --black:#0A0A0A;--char:#111111;--dark:#1A1209;
+  --offwhite:#F9F5ED;--warmwhite:#FFFDF7;
+  --text:#2C1F00;--textsoft:#6B5A3E;
+  --border:rgba(201,168,76,0.25);--borderdark:rgba(201,168,76,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Cairo',sans-serif;color:var(--text);direction:rtl;background:var(--warmwhite)}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+
+/* ── IMAGE PLACEHOLDER ── */
+.img-slot{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.img-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.img-slot .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:2px dashed rgba(201,168,76,.3);gap:6px;cursor:pointer;transition:.2s}
+.img-slot .img-ph:hover{background:rgba(201,168,76,.12);border-color:var(--gold)}
+.img-slot .img-ph .ph-icon{font-size:2rem;color:rgba(201,168,76,.5)}
+.img-slot .img-ph .ph-txt{font-size:.72rem;color:rgba(201,168,76,.6);font-weight:600;text-align:center;padding:0 8px}
+.img-slot img.loaded~.img-ph{display:none}
+
+/* ── GOLD LINE ── */
+.gold-line{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:16px auto}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;border-radius:2px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;border:none;transition:all .3s;letter-spacing:.5px}
+.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));color:var(--black);box-shadow:0 4px 20px rgba(201,168,76,.35)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.5)}
+.btn-outline-gold{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.btn-outline-gold:hover{background:var(--gold);color:var(--black)}
+.btn-wa{background:#25D366;color:#fff;border-radius:30px;box-shadow:0 4px 16px rgba(37,211,102,.35)}
+.btn-wa:hover{background:#1eaf56;transform:translateY(-2px)}
+.btn-dark{background:var(--char);color:var(--gold);border:1px solid var(--border)}
+.btn-dark:hover{background:var(--dark);border-color:var(--gold)}
+
+/* ── HEADER ── */
+header{background:rgba(10,10,10,.97);backdrop-filter:blur(20px);position:fixed;top:0;left:0;right:0;z-index:999;border-bottom:1px solid var(--border)}
+.hdr{display:flex;align-items:center;justify-content:space-between;height:76px;max-width:1200px;margin:0 auto;padding:0 28px}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer}
+.logo-img{height:52px;width:52px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(201,168,76,.4))}
+.logo-text{color:var(--gold2);font-family:'Cairo',sans-serif;font-weight:900;font-size:1.1rem;line-height:1.2}
+.logo-text small{display:block;font-size:.68rem;font-weight:400;color:rgba(201,168,76,.6);letter-spacing:2px;text-transform:uppercase}
+nav{display:flex;align-items:center;gap:2px}
+nav>a,.dd>a{color:rgba(255,255,255,.75);font-size:.87rem;font-weight:600;padding:8px 14px;border-radius:2px;transition:all .2s;display:flex;align-items:center;gap:4px;letter-spacing:.3px}
+nav>a:hover,.dd>a:hover,nav>a.nav-active{color:var(--gold);background:rgba(201,168,76,.08)}
+.dd{position:relative}
+.dd>a::after{content:'▾';font-size:.6rem;opacity:.6;margin-right:3px}
+.dd-menu{display:none;position:absolute;top:calc(100%+8px);right:0;background:rgba(15,10,5,.98);border:1px solid var(--border);min-width:220px;border-radius:2px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dd:hover .dd-menu{display:block}
+.dd-menu a{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:.85rem;color:rgba(255,255,255,.7);border-bottom:1px solid rgba(201,168,76,.1);transition:.2s}
+.dd-menu a:last-child{border-bottom:none}
+.dd-menu a:hover{color:var(--gold);background:rgba(201,168,76,.07);padding-right:24px}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px}
+.hamburger span{width:23px;height:1.5px;background:var(--gold);border-radius:1px;transition:.3s}
+.hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mob-nav{display:none;position:fixed;top:76px;left:0;right:0;background:rgba(10,10,10,.98);z-index:998;padding:20px 24px 28px;border-bottom:1px solid var(--border)}
+.mob-nav.open{display:block}
+.mob-nav a{display:block;color:rgba(255,255,255,.75);font-size:.9rem;font-weight:600;padding:12px 14px;border-bottom:1px solid rgba(201,168,76,.08);transition:.2s}
+.mob-nav a:hover{color:var(--gold)}
+.mob-sub a{font-size:.82rem!important;color:rgba(255,255,255,.5)!important;padding:9px 14px!important;padding-right:28px!important}
+
+/* ── PAGES ── */
+.page{display:none;padding-top:76px}
+.page.active{display:block}
+
+/* ── HERO ── */
+.hero{min-height:calc(100vh - 76px);background:var(--black);display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 30% 50%,rgba(201,168,76,.07) 0%,transparent 70%),radial-gradient(ellipse 40% 80% at 80% 20%,rgba(201,168,76,.04) 0%,transparent 60%)}
+.hero-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.03) 1px,transparent 1px);background-size:60px 60px}
+.hero-bottom-fade{position:absolute;bottom:0;left:0;right:0;height:150px;background:linear-gradient(transparent,var(--warmwhite))}
+.hero-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:30px;height:1px;background:var(--gold);opacity:.6}
+.hero-title{font-family:'Cairo',sans-serif;font-size:clamp(2rem,4.5vw,3.4rem);font-weight:900;color:#fff;line-height:1.15;margin-bottom:10px}
+.hero-title span{background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:1rem;color:rgba(255,255,255,.55);line-height:1.8;margin-bottom:34px;max-width:460px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:48px}
+.hero-stats{display:flex;gap:0;border:1px solid var(--border);border-radius:2px;overflow:hidden}
+.hstat{padding:14px 22px;text-align:center;flex:1;border-left:1px solid var(--border)}
+.hstat:last-child{border-left:none}
+.hstat-num{font-family:'Cairo',sans-serif;font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.hstat-lbl{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:3px;letter-spacing:.5px}
+
+/* hero visual — IMAGE BASED */
+.hero-visual{display:flex;justify-content:center;align-items:center}
+.hero-img-card{width:100%;max-width:380px;border:1px solid var(--border);border-radius:4px;overflow:hidden;position:relative;background:rgba(255,255,255,.03)}
+.hero-img-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);z-index:2}
+.hero-img-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);z-index:2}
+.hero-img-slot{width:100%;height:320px;position:relative;overflow:hidden}
+.hero-img-slot img{width:100%;height:100%;object-fit:cover}
+.hero-img-slot .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(20,15,5,.9),rgba(10,8,3,.95));gap:10px}
+.hero-img-slot .img-ph .ph-icon{font-size:3.5rem;opacity:.35}
+.hero-img-slot .img-ph .ph-txt{font-size:.8rem;color:rgba(201,168,76,.5);font-weight:600;text-align:center}
+.hero-img-caption{padding:14px 20px;background:rgba(0,0,0,.6)}
+.hero-img-caption h3{font-size:1rem;font-weight:900;color:var(--gold2);margin-bottom:3px}
+.hero-img-caption p{font-size:.77rem;color:rgba(255,255,255,.45)}
+
+/* ── SECTIONS ── */
+.sec{padding:90px 0}
+.sec-dark{background:var(--char)}
+.sec-black{background:var(--black)}
+.sec-warm{background:var(--offwhite)}
+.container{max-width:1200px;margin:0 auto;padding:0 28px}
+.sec-head{text-align:center;margin-bottom:60px}
+.sec-eyebrow{display:inline-block;color:var(--gold);font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.sec-head h2{font-family:'Cairo',sans-serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:900;color:var(--dark);line-height:1.2}
+.sec-dark .sec-head h2,.sec-black .sec-head h2{color:var(--gold2)}
+.sec-head p{color:var(--textsoft);font-size:.97rem;line-height:1.8;max-width:550px;margin:12px auto 0}
+.sec-dark .sec-head p,.sec-black .sec-head p{color:rgba(255,255,255,.5)}
+
+/* ── WHY ── */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.why-img-wrap{position:relative}
+.why-img-box{background:var(--black);border:1px solid var(--border);border-radius:4px;height:480px;overflow:hidden;position:relative}
+.why-img-box img{width:100%;height:100%;object-fit:cover}
+.why-img-box .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(201,168,76,.05),rgba(0,0,0,.95));gap:10px}
+.why-img-box .img-ph .ph-icon{font-size:4rem;opacity:.25}
+.why-img-box .img-ph .ph-txt{font-size:.8rem;color:rgba(201,168,76,.45);font-weight:600;text-align:center}
+.why-badge{position:absolute;bottom:-16px;right:-16px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:2px;padding:14px 20px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(201,168,76,.3)}
+.why-badge-num{font-family:'Cairo',sans-serif;font-size:1.8rem;font-weight:900;color:var(--black);line-height:1}
+.why-badge-lbl{font-size:.75rem;color:rgba(0,0,0,.65);line-height:1.4;font-weight:600}
+.why-text .eyebrow{color:var(--gold);font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;display:block}
+.why-text h2{font-family:'Cairo',sans-serif;font-size:clamp(1.6rem,2.5vw,2rem);font-weight:900;color:var(--dark);margin-bottom:14px;line-height:1.25}
+.why-text>p{color:var(--textsoft);line-height:1.85;margin-bottom:28px;font-size:.96rem}
+.why-points{display:flex;flex-direction:column;gap:14px;margin-bottom:34px}
+.why-pt{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;background:var(--warmwhite);border:1px solid rgba(201,168,76,.15);border-right:3px solid var(--gold);border-radius:0 2px 2px 0}
+.why-pt-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.why-pt h4{font-size:.9rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+.why-pt p{font-size:.83rem;color:var(--textsoft);line-height:1.6}
+
+/* ── SERVICES GRID ── */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:20px}
+.svc-card{background:var(--warmwhite);border:1px solid rgba(201,168,76,.2);border-radius:2px;overflow:hidden;transition:all .3s;cursor:pointer;display:block;color:inherit;position:relative}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:.3s}
+.svc-card:hover{transform:translateY(-5px);box-shadow:0 15px 45px rgba(201,168,76,.12);border-color:rgba(201,168,76,.5)}
+.svc-card:hover::after{opacity:1}
+
+/* service image slot */
+.svc-img-slot{width:100%;height:170px;position:relative;overflow:hidden;background:var(--black)}
+.svc-img-slot img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.svc-card:hover .svc-img-slot img{transform:scale(1.05)}
+.svc-img-slot .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(20,13,2,.92),rgba(10,8,3,.96));gap:8px;transition:.2s}
+.svc-img-slot .img-ph .ph-icon{font-size:2.8rem;opacity:.35}
+.svc-img-slot .img-ph .ph-txt{font-size:.7rem;color:rgba(201,168,76,.5);font-weight:600;text-align:center;padding:0 6px}
+
+.svc-card-body{padding:20px}
+.svc-card-body h3{font-family:'Cairo',sans-serif;font-size:1rem;font-weight:800;color:var(--dark);margin-bottom:8px}
+.svc-card-body p{font-size:.85rem;color:var(--textsoft);line-height:1.65}
+.svc-arrow{display:inline-flex;align-items:center;gap:5px;margin-top:12px;font-size:.8rem;font-weight:700;color:var(--gold);opacity:0;transition:.25s}
+.svc-card:hover .svc-arrow{opacity:1}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.testi-card{border:1px solid rgba(201,168,76,.2);border-radius:2px;padding:26px;transition:.3s;background:rgba(201,168,76,.03)}
+.testi-card:hover{background:rgba(201,168,76,.07);border-color:rgba(201,168,76,.4);transform:translateY(-3px)}
+.testi-stars{color:var(--gold);font-size:.95rem;letter-spacing:3px;margin-bottom:14px}
+.testi-quote{font-size:2rem;color:var(--gold);opacity:.3;line-height:1;margin-bottom:6px;font-family:'Playfair Display',serif}
+.testi-text{color:rgba(255,255,255,.7);font-size:.88rem;line-height:1.8;margin-bottom:18px}
+.testi-author{display:flex;align-items:center;gap:10px;border-top:1px solid rgba(201,168,76,.15);padding-top:14px}
+.testi-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;color:var(--black);font-size:.85rem;font-weight:800;flex-shrink:0}
+.testi-name{font-weight:700;color:var(--gold2);font-size:.88rem}
+.testi-role{font-size:.75rem;color:rgba(255,255,255,.4)}
+
+/* ── FAQ ── */
+.faq-wrap{max-width:760px;margin:0 auto}
+.faq-item{border:1px solid rgba(201,168,76,.2);border-radius:2px;margin-bottom:10px;overflow:hidden;transition:.25s}
+.faq-item:hover{border-color:rgba(201,168,76,.45)}
+.faq-item.open{border-color:var(--gold);box-shadow:0 5px 25px rgba(201,168,76,.1)}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;font-weight:700;font-size:.95rem;color:var(--offwhite);cursor:pointer;gap:10px;user-select:none}
+.faq-toggle{width:26px;height:26px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1rem;flex-shrink:0;transition:.3s}
+.faq-item.open .faq-toggle{background:var(--gold);color:var(--black);border-color:var(--gold)}
+.faq-a{display:none;padding:0 22px 20px;color:rgba(255,255,255,.55);font-size:.9rem;line-height:1.9;border-top:1px solid rgba(201,168,76,.12)}
+.faq-item.open .faq-a{display:block}
+
+/* ── CONTACT ── */
+.contact-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-bottom:50px}
+.ctc-card{background:var(--warmwhite);border:1px solid rgba(201,168,76,.2);border-radius:2px;padding:28px 22px;text-align:center;transition:.3s;display:block;color:inherit}
+.ctc-card:hover{transform:translateY(-4px);box-shadow:0 12px 35px rgba(201,168,76,.1);border-color:var(--gold)}
+.ctc-icon{width:58px;height:58px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 14px;box-shadow:0 6px 18px rgba(201,168,76,.25)}
+.ctc-card h3{font-size:.93rem;font-weight:700;color:var(--dark);margin-bottom:7px}
+.ctc-card p{color:var(--textsoft);font-size:.88rem;line-height:1.65}
+.ctc-val{color:var(--gold3);font-weight:800;font-size:1.05rem;margin-top:5px}
+.wa-block{background:linear-gradient(135deg,#064e3b,#065f46);border:1px solid rgba(37,211,102,.2);border-radius:2px;padding:50px 40px;text-align:center}
+.wa-block .wa-ico{font-size:3.5rem;margin-bottom:12px}
+.wa-block h3{font-family:'Cairo',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px}
+.wa-block p{color:rgba(255,255,255,.65);margin-bottom:24px;font-size:.95rem;line-height:1.75}
+
+/* ── PAGE BAND ── */
+.page-band{background:linear-gradient(135deg,var(--black) 0%,#1a1005 100%);padding:48px 0 36px;border-bottom:1px solid var(--border)}
+.page-band .bc{font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.page-band .bc a{color:rgba(201,168,76,.6)}
+.page-band .bc a:hover{color:var(--gold)}
+.page-band h1{font-family:'Cairo',sans-serif;font-size:clamp(1.6rem,3vw,2.1rem);font-weight:900;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── SERVICE DETAIL ── */
+.svc-layout{display:grid;grid-template-columns:1fr 260px;gap:36px;padding:50px 0}
+.svc-sidebar{height:fit-content;position:sticky;top:96px}
+.sidebar-box{background:var(--warmwhite);border:1px solid rgba(201,168,76,.2);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.sidebar-title{background:var(--black);color:var(--gold);padding:13px 18px;font-size:.83rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.sidebar-box a{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;font-size:.84rem;color:var(--text);border-bottom:1px solid rgba(201,168,76,.1);transition:.18s;gap:6px}
+.sidebar-box a:last-child{border-bottom:none}
+.sidebar-box a:hover,.sidebar-box a.s-active{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));color:var(--gold3)}
+.sidebar-box a.s-active{font-weight:700}
+.sidebar-box a::after{content:'←';font-size:.75rem;opacity:.4;flex-shrink:0}
+.sidebar-cta{background:linear-gradient(135deg,var(--black),#1a1005);border:1px solid var(--border);border-radius:2px;padding:22px;text-align:center}
+.sidebar-cta h4{color:var(--gold);font-size:.9rem;font-weight:700;margin-bottom:6px}
+.sidebar-cta p{color:rgba(255,255,255,.5);font-size:.8rem;margin-bottom:14px;line-height:1.6}
+.sidebar-cta .btn{display:flex;justify-content:center;margin-bottom:9px;width:100%;font-size:.83rem;padding:10px 16px}
+
+/* service detail — main image */
+.svc-detail-img{width:100%;height:280px;border-radius:2px;overflow:hidden;border:1px solid rgba(201,168,76,.2);margin-bottom:28px;position:relative;background:var(--black)}
+.svc-detail-img img{width:100%;height:100%;object-fit:cover}
+.svc-detail-img .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(20,13,2,.92),rgba(10,8,3,.96));gap:12px}
+.svc-detail-img .img-ph .ph-icon{font-size:4rem;opacity:.28}
+.svc-detail-img .img-ph .ph-txt{font-size:.82rem;color:rgba(201,168,76,.5);font-weight:600;text-align:center;max-width:200px;line-height:1.5}
+
+.svc-content h2{font-family:'Cairo',sans-serif;font-size:1.35rem;font-weight:900;color:var(--dark);margin:28px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.2);display:flex;align-items:center;gap:8px}
+.svc-content h2::before{content:'';width:3px;height:18px;background:linear-gradient(var(--gold3),var(--gold));border-radius:2px;flex-shrink:0}
+.svc-content p{color:#4a3c22;font-size:.95rem;line-height:1.9;margin-bottom:14px}
+.svc-content ul{margin:10px 0 18px;list-style:none}
+.svc-content ul li{color:#4a3c22;font-size:.92rem;line-height:1.75;margin-bottom:9px;padding-right:18px;position:relative}
+.svc-content ul li::before{content:'◆';position:absolute;right:0;color:var(--gold);font-size:.5rem;top:8px}
+.highlight-box{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border-right:3px solid var(--gold);border-radius:0 2px 2px 0;padding:16px 20px;margin:18px 0;color:var(--dark);font-size:.9rem;line-height:1.85}
+
+/* ── ABOUT ── */
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.mission-img-box{border:1px solid var(--border);border-radius:4px;height:440px;overflow:hidden;position:relative;background:var(--black)}
+.mission-img-box img{width:100%;height:100%;object-fit:cover}
+.mission-img-box .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(201,168,76,.06),rgba(0,0,0,.95));gap:12px}
+.mission-img-box .img-ph .ph-icon{font-size:5rem;opacity:.2}
+.mission-img-box .img-ph .ph-txt{font-size:.82rem;color:rgba(201,168,76,.45);font-weight:600;text-align:center;max-width:180px}
+.chk-list{display:flex;flex-direction:column;gap:12px;margin:20px 0 28px}
+.chk-item{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;background:var(--offwhite);border:1px solid rgba(201,168,76,.15);border-right:3px solid var(--gold);border-radius:0 2px 2px 0}
+.chk-ico{width:24px;height:24px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--black);font-size:.75rem;font-weight:900;flex-shrink:0;margin-top:1px}
+.chk-item p{font-size:.9rem;color:var(--text);line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:var(--black);padding:60px 0 28px;border-top:1px solid var(--border)}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:52px;margin-bottom:44px}
+.ft-brand-logo{height:56px;object-fit:contain;margin-bottom:14px;filter:drop-shadow(0 0 15px rgba(201,168,76,.2))}
+.ft-brand p{font-size:.85rem;line-height:1.8;color:rgba(255,255,255,.4);max-width:300px}
+.ft-col h4{color:var(--gold);font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.2)}
+.ft-col ul{list-style:none}
+.ft-col ul li{margin-bottom:10px}
+.ft-col ul li a{color:rgba(255,255,255,.45);font-size:.85rem;transition:.2s;display:flex;align-items:center;gap:6px}
+.ft-col ul li a:hover{color:var(--gold)}
+.ft-ci{display:flex;align-items:flex-start;gap:9px;margin-bottom:12px;font-size:.83rem;color:rgba(255,255,255,.4);line-height:1.6}
+.ft-ci a{color:rgba(255,255,255,.4)}
+.ft-ci a:hover{color:var(--gold)}
+.ft-bottom{border-top:1px solid rgba(201,168,76,.12);padding-top:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.ft-bottom p{font-size:.78rem;color:rgba(255,255,255,.25)}
+.ft-bottom a{font-size:.78rem;color:rgba(201,168,76,.4);transition:.2s}
+.ft-bottom a:hover{color:var(--gold)}
+
+/* ── FLOAT BTNS ── */
+.floats{position:fixed;bottom:24px;left:24px;display:flex;flex-direction:column;gap:10px;z-index:997}
+.fl-btn{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 5px 20px rgba(0,0,0,.35);transition:.3s;text-decoration:none;color:#fff;border:none}
+.fl-btn:hover{transform:scale(1.1)}
+.fl-phone{background:linear-gradient(135deg,var(--gold3),var(--gold))}
+.fl-wa{background:#25D366}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .hero-inner,.why-grid,.mission-grid{grid-template-columns:1fr;gap:40px}
+  .hero-inner{text-align:center;padding:60px 0 80px}
+  .hero-subtitle{max-width:none}
+  .hero-btns{justify-content:center}
+  .hero-visual{order:-1}
+  .why-img-wrap{display:none}
+  .svc-layout{grid-template-columns:1fr}
+  .svc-sidebar{position:static}
+  .ft-grid{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media(max-width:640px){
+  nav{display:none!important}
+  .hamburger{display:flex}
+  .svc-grid{grid-template-columns:1fr}
+  .testi-grid{grid-template-columns:1fr}
+  .ft-grid{grid-template-columns:1fr;gap:26px}
+  .ft-bottom{flex-direction:column;text-align:center}
+  .hero-stats{flex-wrap:wrap}
+  .hstat{border-bottom:1px solid var(--border);min-width:40%}
+  .wa-block{padding:36px 20px}
+  .sec{padding:60px 0}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.page.active .hero-inner{animation:fadeUp .7s ease both}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+ <div class="hdr">
+  <div class="logo" onclick="goPage('home')">
+   <img id="site-logo" src="Finaaaaal.png" class="logo-img" alt="AL-ARAB" onerror="this.style.display='none'">
+   <div class="logo-text" id="site-name-hdr">مركز العراب <small>AL-ARAB DENTAL</small></div>
+  </div>
+  <nav id="main-nav">
+   <a href="#" onclick="goPage('home');track('nav','home')" id="n-home" class="nav-active">الرئيسية</a>
+   <a href="#" onclick="goPage('about');track('nav','about')" id="n-about">من نحن</a>
+   <div class="dd">
+    <a href="#" onclick="goPage('services');track('nav','services')" id="n-services">خدماتنا</a>
+    <div class="dd-menu">
+     <a href="#" onclick="goPage('cosmetic');track('nav','cosmetic')">تجميل الأسنان</a>
+     <a href="#" onclick="goPage('implants');track('nav','implants')">تركيبات الاسنان</a>
+     <a href="#" onclick="goPage('implants2');track('nav','implants2')">زراعة الأسنان</a>
+     <a href="#" onclick="goPage('fillings');track('nav','fillings')">الحشوات التجميلية</a>
+     <a href="#" onclick="goPage('nerve');track('nav','nerve')">حشو العصب</a>
+     <a href="#" onclick="goPage('ortho');track('nav','ortho')">تقويم الاسنان</a>
+     <a href="#" onclick="goPage('gum');track('nav','gum')">تجميل اللثة</a>
+     <a href="#" onclick="goPage('kids');track('nav','kids')">طب اسنان الأطفال</a>
+    </div>
+   </div>
+   <a href="#" onclick="goPage('contact');track('nav','contact')" id="n-contact">تواصل معنا</a>
+   <a href="#" onclick="goPage('contact');track('nav','book')" class="btn btn-gold" style="padding:9px 20px;font-size:.84rem">✦ احجز موعد</a>
+  </nav>
+  <div class="hamburger" id="burger" onclick="toggleMob()"><span></span><span></span><span></span></div>
+ </div>
+</header>
+<div class="mob-nav" id="mob-nav">
+ <a href="#" onclick="goPage('home')">الرئيسية</a>
+ <a href="#" onclick="goPage('about')">من نحن</a>
+ <a href="#" onclick="goPage('services')">خدماتنا</a>
+ <div class="mob-sub">
+  <a href="#" onclick="goPage('cosmetic')">تجميل الأسنان</a>
+  <a href="#" onclick="goPage('implants')">تركيبات الاسنان</a>
+  <a href="#" onclick="goPage('implants2')">زراعة الأسنان</a>
+  <a href="#" onclick="goPage('fillings')">الحشوات التجميلية</a>
+  <a href="#" onclick="goPage('nerve')">حشو العصب</a>
+  <a href="#" onclick="goPage('ortho')">تقويم الاسنان</a>
+  <a href="#" onclick="goPage('gum')">تجميل اللثة</a>
+  <a href="#" onclick="goPage('kids')">اسنان الأطفال</a>
+ </div>
+ <a href="#" onclick="goPage('contact')">تواصل معنا</a>
+ <a href="#" id="mob-wa-link" onclick="track('whatsapp','mobile-nav')" style="color:#25D366;font-weight:700;margin-top:6px">💬 واتساب</a>
+</div>
+
+<!-- ════════════ HOME ════════════ -->
+<div id="page-home" class="page active">
+
+ <section class="hero">
+  <div class="hero-bg"></div><div class="hero-lines"></div><div class="hero-bottom-fade"></div>
+  <div class="container hero-inner">
+   <div>
+    <div class="hero-eyebrow">مركز متخصص في مصر الجديدة</div>
+    <h1 class="hero-title" id="hero-title-txt">ابتسامتك<br>تستحق <span>الأفضل</span></h1>
+    <p class="hero-subtitle" id="hero-desc-txt">يضم مركز العراب نخبة من أفضل أطباء الأسنان المؤهلين وذوي خبرة في علاج وتجميل الأسنان باستخدام أحدث التقنيات والأجهزة الطبية.</p>
+    <div class="hero-btns">
+     <a href="#" id="hero-wa-btn" class="btn btn-gold" onclick="track('whatsapp','hero')">✦ احجز موعدك الآن</a>
+     <a href="#" id="hero-phone-btn" class="btn btn-outline-gold" onclick="track('phone','hero')">📞 اتصل بنا</a>
+    </div>
+    <div class="hero-stats" id="hero-stats-wrap">
+     <div class="hstat"><div class="hstat-num" id="stat0-num">+1000</div><div class="hstat-lbl" id="stat0-lbl">مريض راضٍ</div></div>
+     <div class="hstat"><div class="hstat-num" id="stat1-num">8</div><div class="hstat-lbl" id="stat1-lbl">خدمات</div></div>
+     <div class="hstat"><div class="hstat-num" id="stat2-num">+10</div><div class="hstat-lbl" id="stat2-lbl">سنوات خبرة</div></div>
+     <div class="hstat"><div class="hstat-num" id="stat3-num">100%</div><div class="hstat-lbl" id="stat3-lbl">رضا تام</div></div>
+    </div>
+   </div>
+   <div class="hero-visual">
+    <div class="hero-img-card">
+     <div class="hero-img-slot" id="hero-img-slot">
+      <img id="hero-main-img" src="" alt="مركز العراب" style="display:none">
+      <div class="img-ph">
+       <div class="ph-icon">🏥</div>
+       <div class="ph-txt">صورة المركز الرئيسية<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div>
+      </div>
+     </div>
+     <div class="hero-img-caption">
+      <h3 id="hero-card-name">مركز العراب لطب الأسنان</h3>
+      <p id="hero-card-addr">مصر الجديدة · ميدان سانت فاتيما · الدور الثالث</p>
+     </div>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- WHY -->
+ <section class="sec sec-warm">
+  <div class="container">
+   <div class="why-grid">
+    <div class="why-img-wrap">
+     <div class="why-img-box" id="why-img-box">
+      <img id="why-main-img" src="" alt="" style="display:none">
+      <div class="img-ph">
+       <div class="ph-icon">🦷</div>
+       <div class="ph-txt">صورة قسم "من نحن"<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div>
+      </div>
+     </div>
+     <div class="why-badge"><div class="why-badge-num">١٠+</div><div class="why-badge-lbl">سنوات<br>خبرة</div></div>
+    </div>
+    <div class="why-text">
+     <span class="eyebrow">من نحن</span>
+     <h2>لماذا تختار مركز العراب؟</h2>
+     <p id="why-desc-txt">عيادة العراب هي واحدة من أبرز عيادات الأسنان المتخصصة في تجميل وزراعة الأسنان في مصر، تتميز بأعلى معايير الجودة والكفاءة.</p>
+     <div class="why-points">
+      <div class="why-pt"><div class="why-pt-icon">🔬</div><div><h4>أحدث التقنيات</h4><p>نستمر في البحث واستقطاب أحدث التقنيات في طب الأسنان.</p></div></div>
+      <div class="why-pt"><div class="why-pt-icon">🌍</div><div><h4>معايير عالمية</h4><p>نقدم مستوى جديد من الخدمات المتميزة بالدقة والنجاح الدولي.</p></div></div>
+      <div class="why-pt"><div class="why-pt-icon">⭐</div><div><h4>جودة وكفاءة</h4><p>تجميل وزراعة أسنان بأعلى معايير الجودة والكفاءة.</p></div></div>
+     </div>
+     <a href="#" onclick="goPage('about')" class="btn btn-gold">اعرف أكثر عنا</a>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- SERVICES -->
+ <section class="sec">
+  <div class="container">
+   <div class="sec-head">
+    <span class="sec-eyebrow">تخصصاتنا</span>
+    <h2>خدماتنا</h2>
+    <p>نلتزم بتقديم خدمات طب الأسنان بأعلى مستويات الجودة والدقة</p>
+    <div class="gold-line"></div>
+   </div>
+   <div class="svc-grid" id="home-svc-grid">
+    <!-- rendered by JS -->
+   </div>
+   <div style="text-align:center;margin-top:36px">
+    <a href="#" onclick="goPage('services')" class="btn btn-gold">عرض جميع الخدمات</a>
+   </div>
+  </div>
+ </section>
+
+ <!-- TESTIMONIALS -->
+ <section class="sec sec-black">
+  <div class="container">
+   <div class="sec-head"><span class="sec-eyebrow">تجارب عملائنا</span><h2>آراء العملاء</h2><div class="gold-line"></div></div>
+   <div class="testi-grid" id="home-testi-grid"><!-- rendered by JS --></div>
+  </div>
+ </section>
+
+ <!-- FAQ -->
+ <section class="sec sec-dark">
+  <div class="container">
+   <div class="sec-head"><span class="sec-eyebrow">أسئلة وأجوبة</span><h2>الأسئلة الشائعة</h2><div class="gold-line"></div></div>
+   <div class="faq-wrap" id="home-faq"><!-- rendered by JS --></div>
+  </div>
+ </section>
+
+ <!-- CONTACT PREVIEW -->
+ <section class="sec sec-warm">
+  <div class="container">
+   <div class="sec-head"><span class="sec-eyebrow">تواصل معنا</span><h2>للتواصل معنا</h2><div class="gold-line"></div></div>
+   <div class="contact-cards">
+    <a id="ctc-phone-lnk" href="#" onclick="track('phone','contact-card')" class="ctc-card"><div class="ctc-icon">📞</div><h3>رقم الاتصال والواتس اب</h3><div class="ctc-val" id="ctc-phone-val">01070570222</div></a>
+    <a id="ctc-email-lnk" href="#" class="ctc-card"><div class="ctc-icon">✉️</div><h3>راسلنا</h3><p id="ctc-email-val">info@alarrabclinic.com</p></a>
+    <a id="ctc-map-lnk" href="#" target="_blank" class="ctc-card"><div class="ctc-icon">📍</div><h3>العنوان</h3><p id="ctc-addr-val">مصر الجديدة، ميدان سانت فاتيما<br>الدور الثالث، شقة 1</p></a>
+   </div>
+  </div>
+ </section>
+
+</div><!-- /home -->
+
+<!-- ════════════ ABOUT ════════════ -->
+<div id="page-about" class="page">
+ <div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span>من نحن</div><h1>من نحن</h1></div></div>
+ <section class="sec sec-warm">
+  <div class="container">
+   <div class="mission-grid">
+    <div>
+     <span class="sec-eyebrow" style="color:var(--gold);font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;display:block;margin-bottom:12px">لماذا نحن</span>
+     <h2 style="font-family:'Cairo',sans-serif;font-size:1.9rem;font-weight:900;color:var(--dark);margin-bottom:16px">لماذا تختار العراب؟</h2>
+     <p style="color:var(--textsoft);line-height:1.85;margin-bottom:20px;font-size:.95rem">عيادة العراب هي واحدة من أبرز عيادات الأسنان المتخصصة في تجميل وزراعة الأسنان في مصر.</p>
+     <div class="chk-list">
+      <div class="chk-item"><div class="chk-ico">✓</div><p>تستمر في البحث واستقطاب أحدث التقنيات في طب الأسنان لتقديم خدمات طبية متطورة.</p></div>
+      <div class="chk-item"><div class="chk-ico">✓</div><p>تقدم مستوى جديد من الخدمات الطبية المتميزة بالدقة والنجاح العالي على المستوى العالمي.</p></div>
+      <div class="chk-item"><div class="chk-ico">✓</div><p>تركز على تقديم خدمات تجميل وزراعة الأسنان بأعلى معايير الجودة والكفاءة.</p></div>
+     </div>
+     <h3 style="font-family:'Cairo',sans-serif;font-size:1.2rem;font-weight:800;color:var(--dark);margin:24px 0 12px">مهمتنا</h3>
+     <p style="color:var(--textsoft);line-height:1.85;font-size:.94rem;margin-bottom:12px" id="mission-txt">تتمثل مهمتنا في مركز العراب في تحسين صحة وجمال الأسنان لمرضانا وتعزيز الوعي الصحي. نحن نسعى جاهدين لتوفير علاجات شاملة ومبتكرة لمشاكل الفم والأسنان، بدءًا من الوقاية وصولاً إلى العلاجات التجميلية وإعادة ترميم الأسنان المفقودة.</p>
+     <a id="about-wa-btn" href="#" class="btn btn-gold" onclick="track('whatsapp','about')" style="margin-top:8px">💬 احجز موعد استشاري</a>
+    </div>
+    <div class="mission-img-box" id="about-img-box">
+     <img id="about-main-img" src="" alt="" style="display:none">
+     <div class="img-ph">
+      <div class="ph-icon">🏥</div>
+      <div class="ph-txt">صورة قسم "من نحن"<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </section>
+ <section class="sec sec-black">
+  <div class="container">
+   <div class="sec-head"><span class="sec-eyebrow">تجارب عملائنا</span><h2>آراء العملاء</h2><div class="gold-line"></div></div>
+   <div class="testi-grid" id="about-testi-grid"></div>
+  </div>
+ </section>
+</div>
+
+<!-- ════════════ SERVICES LIST ════════════ -->
+<div id="page-services" class="page">
+ <div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span>الخدمات</div><h1>خدماتنا</h1></div></div>
+ <section class="sec"><div class="container">
+  <div class="sec-head"><span class="sec-eyebrow">تخصصاتنا</span><h2>خدمات مركز العراب</h2><p>نسعى جاهدين لتوفير علاجات شاملة ومبتكرة</p><div class="gold-line"></div></div>
+  <div class="svc-grid" id="svcs-grid"></div>
+ </div></section>
+</div>
+
+<!-- ════════════ SERVICE DETAIL PAGES ════════════ -->
+<div id="page-cosmetic" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>تجميل الأسنان</div><h1>تجميل الاسنان</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-cosmetic"><div class="svc-detail-img" id="si-cosmetic"><img id="img-cosmetic" src="" style="display:none"><div class="img-ph"><div class="ph-icon">✨</div><div class="ph-txt">صورة خدمة تجميل الأسنان<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>ابتسامة هوليوود</h2><p>ابتسامة هوليود هي إجراء تجميلي للأسنان يهدف إلى تحقيق ابتسامة جميلة ومشرقة. يتضمن هذا الإجراء تركيب قشور صناعية رقيقة على الأسنان، وتصميمها وفقًا للشكل والحجم المناسب لكل فرد.</p><div class="highlight-box">تستخدم أحدث المواد مثل الايماكس السويسري والتي تمنح الأسنان مظهراً طبيعياً يشبه تماماً الأسنان الحقيقية.</div><h2>أنواع الفينير</h2><ul><li><strong>فينير البورسلين:</strong> المفضل للمرضى الذين يرغبون في تغيير شكل أو لون أسنانهم.</li><li><strong>فينير السيراميك:</strong> أحد أنواع الفينير الأكثر استخدامًا على نطاق واسع.</li><li><strong>فينير الأسنان المختلط:</strong> يمكن زرعه من خلال عملية واحدة.</li></ul><h2>تبييض الأسنان</h2><p>تبييض الأسنان يستخدم لتفتيح لون الأسنان لعدة درجات باستخدام تقنية الليزر المتطورة.</p><ul><li>تنظيف الأسنان جيدًا وإزالة الجير الزائد.</li><li>وضع جل لحماية اللثة من الحرق.</li><li>تعريض الأسنان لأشعة الليزر مع المادة المخصصة.</li></ul><h2>مميزات تجميل الأسنان في مركز العراب</h2><ul><li>أفضل التقنيات العالمية في تجميل الأسنان.</li><li>نخبة من أطباء الفم والأسنان ذوي الخبرة العالية.</li><li>الحفاظ على صحة اللثة وعدم إلحاق أي أضرار.</li></ul></div><div class="svc-sidebar" id="sb-cosmetic"></div></div></div></div>
+
+<div id="page-implants" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>تركيبات الاسنان</div><h1>تركيبات الاسنان</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-implants"><div class="svc-detail-img" id="si-implants"><img id="img-implants" src="" style="display:none"><div class="img-ph"><div class="ph-icon">👑</div><div class="ph-txt">صورة خدمة تركيبات الأسنان<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>تركيبات الاسنان</h2><p>تركيب الأسنان هو إجراء يهدف إلى استبدال الأسنان المفقودة أو التالفة بقطع صناعية، بهدف استعادة وظيفة الأسنان الطبيعية وتحقيق المظهر الجمالي.</p><h2>أنواع تركيبات الأسنان</h2><ul><li><strong>تركيبات البورسلين:</strong> تتميز بجمالية شكلها وقوتها وصلابتها.</li><li><strong>تركيبات الزيركون:</strong> الخيار الأكثر شيوعًا والأكثر تطورًا حاليًا.</li><li><strong>تركيبات Biohpp:</strong> تُستخدم في زراعات الأسنان وحالات الفك الكاملة.</li><li><strong>تركيبات PMMA:</strong> للتركيبات المؤقتة بشكل جمالي مميز.</li></ul><h2>مميزات تركيبات الأسنان في مركز العراب</h2><ul><li>خبرة وكفاءة عالية لدى الفريق الطبي المتخصص.</li><li>استخدام أفضل المواد والتقنيات الحديثة.</li><li>تشخيص دقيق لكل حالة على حدة.</li><li>متابعة ما بعد العلاج لضمان أفضل النتائج.</li></ul></div><div class="svc-sidebar" id="sb-implants"></div></div></div></div>
+
+<div id="page-implants2" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>زراعة الأسنان</div><h1>زراعة الأسنان</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-implants2"><div class="svc-detail-img" id="si-implants2"><img id="img-implants2" src="" style="display:none"><div class="img-ph"><div class="ph-icon">🔬</div><div class="ph-txt">صورة خدمة زراعة الأسنان<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>زراعة الأسنان</h2><p>زراعة الأسنان هي إجراء جراحي يهدف إلى استبدال الأسنان المفقودة بأسنان صناعية ثابتة. تتم عن طريق إدخال جذور صناعية من التيتانيوم في الفك.</p><div class="highlight-box">تُعد زراعة الأسنان من أكثر الحلول فعالية واستدامةً لاستبدال الأسنان المفقودة.</div><h2>أنواع زرعات الأسنان</h2><ul><li><strong>الزراعات السويسرية:</strong> تتميز بالاندماج السريع مع العظم.</li><li><strong>الزراعات الألمانية:</strong> تتميز بالقوة والمتانة العالية.</li><li><strong>زرعات Zimmer Biomet الأمريكية:</strong> أحدث التقنيات الطبية.</li></ul><h2>مميزات زراعة الأسنان في مركز العراب</h2><ul><li>تقنيات حديثة ونتائج جذابة بدون مضاعفات.</li><li>فريق طبي متخصص في الزراعة المتقدمة.</li><li>بيئة مريحة وتقنيات تخدير حديثة.</li><li>دعم ومتابعة مستمرة في جميع مراحل العلاج.</li></ul></div><div class="svc-sidebar" id="sb-implants2"></div></div></div></div>
+
+<div id="page-fillings" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>الحشوات التجميلية</div><h1>الحشوات التجميلية</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-fillings"><div class="svc-detail-img" id="si-fillings"><img id="img-fillings" src="" style="display:none"><div class="img-ph"><div class="ph-icon">🦷</div><div class="ph-txt">صورة خدمة الحشوات التجميلية<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>الحشوات التجميلية</h2><p>الحشوات التجميلية هي حشوات ذات لون يتطابق مع لون الأسنان، وتعتبر بديلاً عن الحشوات التقليدية.</p><h2>أنواع الحشوات التجميلية</h2><ul><li><strong>حشوة الكمبوزيت:</strong> لونها الطبيعي قريب جداً من لون الأسنان الحقيقية.</li><li><strong>حشوة السيراميك:</strong> متانة عالية ومقاومة للبقع وتآكل الأسنان.</li><li><strong>حشوة الأيونومير:</strong> حشوة زجاجية تجميلية ممتازة.</li><li><strong>الحشوات المركبة:</strong> تجمع صفات الكمبوزيت والجلاس ايونومير.</li></ul><h2>مميزات الحشوات التجميلية في مركز العراب</h2><ul><li>فريق طبي متخصص ذو خبرة عالية.</li><li>خطط علاج مخصصة لكل حالة.</li><li>استخدام أحدث التقنيات والمواد.</li><li>متابعة دورية لضمان النتائج المطلوبة.</li></ul></div><div class="svc-sidebar" id="sb-fillings"></div></div></div></div>
+
+<div id="page-nerve" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>حشو العصب</div><h1>حشو العصب</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-nerve"><div class="svc-detail-img" id="si-nerve"><img id="img-nerve" src="" style="display:none"><div class="img-ph"><div class="ph-icon">💉</div><div class="ph-txt">صورة خدمة حشو العصب<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>حشو العصب</h2><p>حشو العصب يعد إجراءً طبياً يتم تنفيذه في عيادة الأسنان لعلاج تلف العصب في السن عندما يتأثر بالتسوس العميق أو الإصابة أو الالتهاب.</p><h2>خطوات حشو العصب</h2><ul><li><strong>تخدير موضعي:</strong> لتخدير السن ومنطقة العصب وتقليل الألم.</li><li><strong>فتح القناة:</strong> يُفتح ثقب صغير للوصول إلى مساحة العصب وإزالة الجزء المصاب.</li><li><strong>حشو القناة:</strong> ملء المساحة بمادة خاصة تمنع تسرب البكتيريا.</li><li><strong>إعادة الترميم:</strong> وضع حشوة أو تاج لحماية السن المعالج.</li></ul><h2>مميزات حشو العصب في مركز العراب</h2><ul><li>فريق طبي متخصص بأحدث التقنيات العالمية.</li><li>تقنية حشو القنوات ثلاثية الأبعاد لإحكام الغلق.</li><li>الحفاظ على السن الأصلي وعدم اللجوء للقلع.</li></ul></div><div class="svc-sidebar" id="sb-nerve"></div></div></div></div>
+
+<div id="page-ortho" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>تقويم الاسنان</div><h1>تقويم الاسنان</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-ortho"><div class="svc-detail-img" id="si-ortho"><img id="img-ortho" src="" style="display:none"><div class="img-ph"><div class="ph-icon">😁</div><div class="ph-txt">صورة خدمة تقويم الأسنان<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>تقويم الاسنان</h2><p>تقويم الأسنان هو أسلوب علاجي متقدم يساعد المرضى على تحسين شكل أسنانهم عندما تكون غير مستقيمة أو تعاني من عيوب.</p><h2>أنواع تقويم الأسنان</h2><ul><li><strong>التقويم الشفاف:</strong> شفاف وشبه غير مرئي، مريح للاستخدام.</li><li><strong>التقويم المعدني:</strong> للتعديل الدقيق، مثبت بصورة دائمة على الأسنان.</li><li><strong>تقويم الأسنان المتحرك:</strong> أجزاء قابلة للإزالة، للحالات البسيطة.</li></ul><h2>مميزات تقويم الأسنان في مركز العراب</h2><ul><li>فريق طبي متخصص وذوو خبرة ومهارة.</li><li>خطط علاج مخصصة مع توضيح مراحل العلاج.</li><li>أحدث التقنيات في تقويم الأسنان.</li><li>متابعة دورية لضمان النتائج.</li></ul></div><div class="svc-sidebar" id="sb-ortho"></div></div></div></div>
+
+<div id="page-gum" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>تجميل اللثة</div><h1>تجميل اللثة</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-gum"><div class="svc-detail-img" id="si-gum"><img id="img-gum" src="" style="display:none"><div class="img-ph"><div class="ph-icon">🌿</div><div class="ph-txt">صورة خدمة تجميل اللثة<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>تجميل اللثة</h2><p>تجميل اللثة هو إجراء يتم تنفيذه لتحسين مظهر وشكل اللثة المحيطة بالأسنان وإعطائها مظهرًا أكثر جمالية وتناسبًا.</p><h2>أنواع تجميل اللثة</h2><ul><li><strong>استئصال/تركيب اللثة:</strong> لعلاج اللثة المتضخمة أو المتراجعة.</li><li><strong>تصحيح لون اللثة:</strong> تقنيات تبييض لتحسين وتوحيد اللون.</li><li><strong>طواف اللثة:</strong> لتحسين مظهر وتناسق خط اللثة.</li></ul><h2>مميزات تجميل اللثة في مركز العراب</h2><ul><li>تشخيص دقيق وتحديد احتياجات المريض.</li><li>تقنيات متقدمة مثل الليزر والزراعة اللثوية.</li><li>نتائج دائمة وطبيعية مع متابعة ما بعد العلاج.</li></ul></div><div class="svc-sidebar" id="sb-gum"></div></div></div></div>
+
+<div id="page-kids" class="page"><div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span><a href="#" onclick="goPage('services')">الخدمات</a><span>/</span>طب اسنان الأطفال</div><h1>طب اسنان الأطفال</h1></div></div><div class="container"><div class="svc-layout"><div class="svc-content" id="sc-kids"><div class="svc-detail-img" id="si-kids"><img id="img-kids" src="" style="display:none"><div class="img-ph"><div class="ph-icon">👶</div><div class="ph-txt">صورة خدمة أسنان الأطفال<br><small style="opacity:.6">(تُرفع من لوحة التحكم)</small></div></div></div><h2>طب اسنان الأطفال</h2><p>تختلف رعاية أسنان الأطفال عن رعاية أسنان البالغين وتهدف للمساعدة في الحفاظ على الأسنان الصحية واللثة السليمة.</p><div class="highlight-box">يوصى بزيارة طبيب أسنان الأطفال بمجرد ظهور السن الأول لضمان نشأة صحية لأسنان طفلك.</div><h2>المشكلات الأكثر شيوعًا</h2><ul><li><strong>تأخر ظهور الأسنان الدائمة</strong> — يستدعي استشارة الطبيب لتقييم الحالة.</li><li><strong>تبديل الأسنان اللبنية مبكراً</strong> — قبل أن تسقط بشكل طبيعي.</li><li><strong>خلل في الفك</strong> — نتيجة عادات مثل مص الأصابع.</li><li><strong>تسوس الأسنان</strong> — يتطلب علاجاً فورياً.</li><li><strong>الصدمات والكسور</strong> — تستوجب استشارة طبية عاجلة.</li></ul></div><div class="svc-sidebar" id="sb-kids"></div></div></div></div>
+
+<!-- ════════════ CONTACT ════════════ -->
+<div id="page-contact" class="page">
+ <div class="page-band"><div class="container"><div class="bc"><a href="#" onclick="goPage('home')">الرئيسية</a><span>/</span>تواصل معنا</div><h1>تواصل معنا</h1></div></div>
+ <section class="sec sec-warm">
+  <div class="container">
+   <div class="sec-head"><span class="sec-eyebrow">تواصل معنا</span><h2>كيف تصل إلينا؟</h2><div class="gold-line"></div></div>
+   <div class="contact-cards">
+    <a id="c-phone-lnk" href="#" onclick="track('phone','contact-page')" class="ctc-card"><div class="ctc-icon">📞</div><h3>رقم الاتصال والواتس اب</h3><div class="ctc-val" id="c-phone-val">01070570222</div></a>
+    <a id="c-email-lnk" href="#" class="ctc-card"><div class="ctc-icon">✉️</div><h3>راسلنا</h3><p id="c-email-val">info@alarrabclinic.com</p></a>
+    <a id="c-map-lnk" href="#" target="_blank" class="ctc-card"><div class="ctc-icon">📍</div><h3>العنوان</h3><p id="c-addr-val2">مصر الجديدة، ميدان سانت فاتيما<br>الدور الثالث، شقة 1</p></a>
+   </div>
+   <div class="wa-block">
+    <div class="wa-ico">💬</div>
+    <h3>تواصل معنا على واتساب</h3>
+    <p>احجز موعدك بسهولة عبر واتساب أو استفسر عن أي خدمة من خدماتنا</p>
+    <a id="contact-wa-btn" href="#" class="btn btn-wa" onclick="track('whatsapp','contact-page')" style="font-size:1rem;padding:14px 38px;display:inline-flex">💬 ابدأ المحادثة على واتساب</a>
+   </div>
+   <div style="margin-top:70px">
+    <div class="sec-head"><span class="sec-eyebrow">أسئلة وأجوبة</span><h2>الأسئلة الشائعة</h2><div class="gold-line"></div></div>
+    <div class="faq-wrap" id="contact-faq"></div>
+   </div>
+  </div>
+ </section>
+</div>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer>
+ <div class="container">
+  <div class="ft-grid">
+   <div class="ft-brand">
+    <img id="footer-logo" src="Finaaaaal.png" class="ft-brand-logo" alt="AL-ARAB" onerror="this.style.display='none'">
+    <p>يضم مركز العراب نخبة من أفضل أطباء الأسنان المؤهلين وذوي خبرة في مجال طب الأسنان في علاج وتجميل الأسنان باستخدام أحدث التقنيات والأجهزة الطبية.</p>
+   </div>
+   <div class="ft-col">
+    <h4>روابط رئيسية</h4>
+    <ul>
+     <li><a href="#" onclick="goPage('home')">✦ الرئيسية</a></li>
+     <li><a href="#" onclick="goPage('about')">✦ من نحن</a></li>
+     <li><a href="#" onclick="goPage('services')">✦ خدماتنا</a></li>
+     <li><a href="#" onclick="goPage('contact')">✦ تواصل معنا</a></li>
+    </ul>
+   </div>
+   <div class="ft-col">
+    <h4>تواصل معنا</h4>
+    <div class="ft-ci">📍 <span id="ft-addr">مصر الجديدة، ميدان سانت فاتيما، الدور الثالث، شقة 1</span></div>
+    <div class="ft-ci">📞 <a id="ft-phone" href="tel:01070570222">01070570222</a></div>
+    <div class="ft-ci">✉️ <a id="ft-email" href="mailto:info@alarrabclinic.com">info@alarrabclinic.com</a></div>
+    <div class="ft-ci">💬 <a id="ft-wa" href="#" onclick="track('whatsapp','footer')" target="_blank">واتساب</a></div>
+   </div>
+  </div>
+  <div class="ft-bottom">
+   <p>Copyright © 2026 — مركز العراب لطب الأسنان. جميع الحقوق محفوظة.</p>
+   <a href="admin.html">⚙ إدارة الموقع</a>
+  </div>
+ </div>
+</footer>
+
+<!-- FLOAT BTNS -->
+<div class="floats">
+ <a id="fl-phone-btn" href="#" onclick="track('phone','float')" class="fl-btn fl-phone">📞</a>
+ <a id="fl-wa-btn" href="#" onclick="track('whatsapp','float')" target="_blank" class="fl-btn fl-wa">💬</a>
+</div>
+
+<script>
+// ════════════════════════════════
+// SITE DATA
+// ════════════════════════════════
+const DEFAULT_D = {
+  clinic:{name:'مركز العراب لطب الأسنان',nameEn:'AL-ARAB DENTAL',phone:'01070570222',whatsapp:'https://wa.link/sy35gh',email:'info@alarrabclinic.com',address:'مصر الجديدة، ميدان سانت فاتيما، اعلى المصرف المتحد، الدور الثالث، شقة 1',mapUrl:'https://maps.app.goo.gl/z2UMErDs838cyhpu7',logoSrc:'Finaaaaal.png'},
+  hero:{title:'ابتسامتك تستحق الأفضل',desc:'يضم مركز العراب نخبة من أفضل أطباء الأسنان المؤهلين وذوي خبرة في علاج وتجميل الأسنان باستخدام أحدث التقنيات والأجهزة الطبية.',img:''},
+  about:{img:'',missionText:'تتمثل مهمتنا في مركز العراب في تحسين صحة وجمال الأسنان لمرضانا وتعزيز الوعي الصحي.'},
+  whyImg:'',
+  stats:[{num:'+1000',label:'مريض راضٍ'},{num:'8',label:'خدمات'},{num:'+10',label:'سنوات خبرة'},{num:'100%',label:'رضا تام'}],
+  services:[
+    {id:'cosmetic',icon:'✨',title:'تجميل الأسنان',desc:'إجراء تجميلي للأسنان يهدف إلى تحقيق ابتسامة هوليود.',img:''},
+    {id:'implants2',icon:'🔬',title:'زراعة الأسنان',desc:'إجراء جراحي يهدف إلى استبدال الأسنان المفقودة بأسنان صناعية ثابتة.',img:''},
+    {id:'implants',icon:'👑',title:'تركيب الاسنان',desc:'إجراء يهدف إلى استبدال الأسنان المفقودة أو التالفة بقطع صناعية.',img:''},
+    {id:'nerve',icon:'💉',title:'حشو العصب',desc:'إجراء طبي يتم تنفيذه في عيادة الأسنان لعلاج تلف العصب.',img:''},
+    {id:'ortho',icon:'😁',title:'تقويم الاسنان',desc:'أسلوب علاجي متقدم يساعد على تحسين شكل الاسنان.',img:''},
+    {id:'fillings',icon:'🦷',title:'الحشوات التجميلية',desc:'حشوات ذات لون يتطابق مع لون الأسنان.',img:''},
+    {id:'gum',icon:'🌿',title:'تجميل اللثة',desc:'إجراء لتحسين مظهر وشكل اللثة المحيطة بالأسنان.',img:''},
+    {id:'kids',icon:'👶',title:'طب اسنان الأطفال',desc:'رعاية متخصصة تختلف عن رعاية أسنان البالغين.',img:''}
+  ],
+  testimonials:[
+    {name:'خالد جمال',role:'تجميل أسنان',text:'تجربة رائعة جداً، الأطباء محترفون والخدمة ممتازة.'},
+    {name:'يمني محمد',role:'تبييض أسنان',text:'مركز متميز ونظيف جداً، الأطباء ذوو خبرة عالية والتعامل راقي.'},
+    {name:'محمد مجدي',role:'زراعة أسنان',text:'عملت زراعة أسنان وكانت تجربة ممتازة والنتيجة طبيعية جداً.'},
+    {name:'مني مصطفى',role:'تقويم أسنان',text:'أفضل مركز أسنان زرته في حياتي! النتائج مذهلة.'},
+    {name:'أحمد ياسر',role:'ابتسامة هوليوود',text:'الدكاترة متخصصون وأكفاء، المركز مجهز بأحدث الأجهزة.'}
+  ],
+  faq:[
+    {q:'كيف يمكنني الحفاظ على صحة الأسنان الجيدة؟',a:'تنظيف الأسنان مرتين يوميًا، استخدام خيط الأسنان، الابتعاد عن التدخين، الحمية الغذائية الصحية، وزيارة طبيب الأسنان كل ستة أشهر.'},
+    {q:'ما هو التسوس وكيف يمكن علاجه؟',a:'تسوس الأسنان يُعالج بالفلورايد، الحشوات المركبة، علاج عصب السن، أو التاج الكامل حسب درجة الضرر.'},
+    {q:'ما هي أعراض التهاب اللثة؟',a:'احمرار اللثة وتورمها، النزيف عند التنظيف، رائحة الفم الكريهة، وألم في المنطقة الملتهبة.'},
+    {q:'ما هي الأسباب الشائعة لسقوط مسمار زراعة الأسنان؟',a:'عدم التكامل العظمي، التهاب اللثة المزمن، الضغط الزائد، ومشكلات في التصميم أو التركيب.'}
+  ]
+};
+
+let D = JSON.parse(localStorage.getItem('alarrab_sitedata') || 'null') || JSON.parse(JSON.stringify(DEFAULT_D));
+
+// ════════════════════════════════
+// TRACKING
+// ════════════════════════════════
+function track(type, loc) {
+  const stats = JSON.parse(localStorage.getItem('alarrab_stats') || '{}');
+  const today = new Date().toISOString().split('T')[0];
+  if (!stats.pageviews) stats.pageviews = {};
+  if (!stats.clicks) stats.clicks = {phone:0, whatsapp:0, email:0, map:0};
+  if (!stats.daily) stats.daily = {};
+  if (!stats.daily[today]) stats.daily[today] = {views:0, phone:0, whatsapp:0};
+  if (type === 'phone') { stats.clicks.phone++; stats.daily[today].phone++; }
+  if (type === 'whatsapp') { stats.clicks.whatsapp++; stats.daily[today].whatsapp++; }
+  if (type === 'email') stats.clicks.email = (stats.clicks.email||0)+1;
+  if (type === 'map') stats.clicks.map = (stats.clicks.map||0)+1;
+  localStorage.setItem('alarrab_stats', JSON.stringify(stats));
+}
+function trackPage(p) {
+  const stats = JSON.parse(localStorage.getItem('alarrab_stats') || '{}');
+  if (!stats.pageviews) stats.pageviews = {};
+  stats.pageviews[p] = (stats.pageviews[p]||0)+1;
+  stats.total = (stats.total||0)+1;
+  const today = new Date().toISOString().split('T')[0];
+  if (!stats.daily) stats.daily = {};
+  if (!stats.daily[today]) stats.daily[today] = {views:0, phone:0, whatsapp:0};
+  stats.daily[today].views++;
+  localStorage.setItem('alarrab_stats', JSON.stringify(stats));
+}
+
+// ════════════════════════════════
+// RENDER
+// ════════════════════════════════
+function applyData() {
+  const c = D.clinic;
+  // Logo
+  ['site-logo','footer-logo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && c.logoSrc) { el.src = c.logoSrc; el.style.display=''; }
+  });
+  // Name
+  const nh = document.getElementById('site-name-hdr');
+  if (nh) nh.innerHTML = c.name + `<small>${c.nameEn}</small>`;
+  // Hero text
+  const ht = document.getElementById('hero-title-txt');
+  if (ht && D.hero.title) ht.innerHTML = D.hero.title.replace('الأفضل','<span>الأفضل</span>');
+  const hd = document.getElementById('hero-desc-txt');
+  if (hd && D.hero.desc) hd.textContent = D.hero.desc;
+  // Hero image
+  setImg('hero-main-img', D.hero.img, 'hero-img-slot');
+  // Why img
+  setImg('why-main-img', D.whyImg, 'why-img-box');
+  // About img
+  setImg('about-main-img', D.about?.img, 'about-img-box');
+  // Mission text
+  const mt = document.getElementById('mission-txt');
+  if (mt && D.about?.missionText) mt.textContent = D.about.missionText;
+  // Hero card
+  const hcn = document.getElementById('hero-card-name');
+  if (hcn) hcn.textContent = c.name;
+  const hca = document.getElementById('hero-card-addr');
+  if (hca) hca.textContent = c.address;
+  // Stats
+  D.stats.forEach((s,i) => {
+    const n = document.getElementById(`stat${i}-num`);
+    const l = document.getElementById(`stat${i}-lbl`);
+    if (n) n.textContent = s.num;
+    if (l) l.textContent = s.label;
+  });
+  // Contact links
+  setContactLinks(c);
+  // Footer
+  const fa = document.getElementById('ft-addr'); if (fa) fa.textContent = c.address;
+  const fp = document.getElementById('ft-phone'); if (fp) { fp.textContent = c.phone; fp.href = 'tel:'+c.phone; }
+  const fe = document.getElementById('ft-email'); if (fe) { fe.textContent = c.email; fe.href = 'mailto:'+c.email; }
+  const fw = document.getElementById('ft-wa'); if (fw) fw.href = c.whatsapp;
+  // Float
+  const flp = document.getElementById('fl-phone-btn'); if (flp) flp.href = 'tel:'+c.phone;
+  const flw = document.getElementById('fl-wa-btn'); if (flw) flw.href = c.whatsapp;
+  // Mob wa
+  const mw = document.getElementById('mob-wa-link'); if (mw) mw.href = c.whatsapp;
+  // Hero btns
+  const hwb = document.getElementById('hero-wa-btn'); if (hwb) hwb.href = c.whatsapp;
+  const hpb = document.getElementById('hero-phone-btn'); if (hpb) hpb.href = 'tel:'+c.phone;
+  // About wa
+  const awb = document.getElementById('about-wa-btn'); if (awb) awb.href = c.whatsapp;
+  // Contact page
+  const cwb = document.getElementById('contact-wa-btn'); if (cwb) cwb.href = c.whatsapp;
+  // Service images
+  D.services.forEach(s => {
+    if (s.img) setImg('img-'+s.id, s.img, 'si-'+s.id);
+  });
+  // Render grids
+  renderSvcGrid('home-svc-grid');
+  renderSvcGrid('svcs-grid');
+  renderTestiGrid('home-testi-grid');
+  renderTestiGrid('about-testi-grid');
+  renderFaqList('home-faq');
+  renderFaqList('contact-faq');
+  // Sidebars
+  ['cosmetic','implants','implants2','fillings','nerve','ortho','gum','kids'].forEach(injectSidebar);
+}
+
+function setImg(imgId, src, boxId) {
+  if (!src) return;
+  const img = document.getElementById(imgId);
+  const box = document.getElementById(boxId);
+  if (!img || !box) return;
+  img.src = src;
+  img.style.display = 'block';
+  const ph = box.querySelector('.img-ph');
+  if (ph) ph.style.display = 'none';
+}
+
+function setContactLinks(c) {
+  [['ctc-phone-lnk','c-phone-lnk'], ['ctc-phone-val','c-phone-val']].forEach(([a,b]) => {
+    [a,b].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = c.phone; });
+  });
+  [['ctc-phone-lnk','c-phone-lnk']].forEach(([a,b]) => {
+    [a,b].forEach(id => { const el=document.getElementById(id); if(el) el.href = 'tel:'+c.phone; });
+  });
+  [['ctc-email-val','c-email-val']].forEach(([a,b]) => {
+    [a,b].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = c.email; });
+  });
+  [['ctc-email-lnk','c-email-lnk']].forEach(([a,b]) => {
+    [a,b].forEach(id => { const el=document.getElementById(id); if(el) el.href = 'mailto:'+c.email; });
+  });
+  [['ctc-map-lnk','c-map-lnk']].forEach(([a,b]) => {
+    [a,b].forEach(id => { const el=document.getElementById(id); if(el) el.href = c.mapUrl; });
+  });
+  [['ctc-addr-val','c-addr-val2']].forEach(([a,b]) => {
+    [a,b].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML = c.address.replace('،',',<br>'); });
+  });
+}
+
+function renderSvcGrid(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = D.services.map(s => `
+  <a class="svc-card" href="#" onclick="goPage('${s.id}');track('nav','${s.id}')">
+   <div class="svc-img-slot">
+    ${s.img ? `<img src="${s.img}" alt="${s.title}" onerror="this.style.display='none'">` : ''}
+    <div class="img-ph" ${s.img ? 'style="display:none"' : ''}>
+     <div class="ph-icon">${s.icon}</div>
+     <div class="ph-txt">${s.title}</div>
+    </div>
+   </div>
+   <div class="svc-card-body">
+    <h3>${s.title}</h3>
+    <p>${s.desc}</p>
+    <span class="svc-arrow">اعرف أكثر →</span>
+   </div>
+  </a>`).join('');
+}
+
+function renderTestiGrid(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = D.testimonials.map(t => `
+  <div class="testi-card">
+   <div class="testi-stars">★★★★★</div>
+   <div class="testi-quote">"</div>
+   <p class="testi-text">${t.text}</p>
+   <div class="testi-author">
+    <div class="testi-av">${t.name.charAt(0)}</div>
+    <div><div class="testi-name">${t.name}</div><div class="testi-role">${t.role}</div></div>
+   </div>
+  </div>`).join('');
+}
+
+function renderFaqList(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = D.faq.map(f => `
+  <div class="faq-item">
+   <div class="faq-q" onclick="tFaq(this)">
+    <span>${f.q}</span>
+    <div class="faq-toggle">+</div>
+   </div>
+   <div class="faq-a"><br>${f.a}</div>
+  </div>`).join('');
+}
+
+function injectSidebar(id) {
+  const el = document.getElementById('sb-'+id);
+  if (!el) return;
+  el.innerHTML = `
+  <div class="sidebar-box">
+   <div class="sidebar-title">✦ خدماتنا</div>
+   ${D.services.map(s=>`<a href="#" onclick="goPage('${s.id}')" data-page="${s.id}">${s.icon} ${s.title}</a>`).join('')}
+  </div>
+  <div class="sidebar-cta">
+   <h4>احجز موعدك</h4>
+   <p>تواصل معنا عبر واتساب أو هاتف</p>
+   <a href="${D.clinic.whatsapp}" target="_blank" class="btn btn-wa" onclick="track('whatsapp','sidebar')">💬 واتساب</a>
+   <a href="tel:${D.clinic.phone}" class="btn btn-dark" onclick="track('phone','sidebar')">📞 ${D.clinic.phone}</a>
+  </div>`;
+}
+
+// ════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════
+const PAGES = ['home','about','services','cosmetic','implants','implants2','fillings','nerve','ortho','gum','kids','contact'];
+const NAV_ITEMS = ['home','about','services','contact'];
+function goPage(p) {
+  PAGES.forEach(id => { const el=document.getElementById('page-'+id); if(el) el.classList.toggle('active',id===p); });
+  NAV_ITEMS.forEach(id => { const el=document.getElementById('n-'+id); if(el) el.classList.remove('nav-active'); });
+  const grp=['cosmetic','implants','implants2','fillings','nerve','ortho','gum','kids','services'];
+  const t = grp.includes(p) ? 'services' : p;
+  const ne = document.getElementById('n-'+t); if(ne) ne.classList.add('nav-active');
+  document.querySelectorAll('.sidebar-box a').forEach(a => a.classList.toggle('s-active', a.dataset.page===p));
+  closeMob();
+  trackPage(p);
+  window.scrollTo({top:0,behavior:'smooth'});
+  return false;
+}
+function tFaq(el) {
+  const it = el.parentElement;
+  const was = it.classList.contains('open');
+  el.closest('.faq-wrap').querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  el.closest('.faq-wrap').querySelectorAll('.faq-toggle').forEach(t=>t.textContent='+');
+  if(!was){it.classList.add('open');el.querySelector('.faq-toggle').textContent='−';}
+}
+function toggleMob(){document.getElementById('mob-nav').classList.toggle('open');document.getElementById('burger').classList.toggle('open')}
+function closeMob(){document.getElementById('mob-nav').classList.remove('open');document.getElementById('burger').classList.remove('open')}
+document.querySelectorAll('a[onclick]').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+
+// INIT
+trackPage('home');
+// Listen for data updates from admin
+window.addEventListener('storage', e => {
+  if (e.key === 'alarrab_sitedata') {
+    D = JSON.parse(e.newValue);
+    applyData();
+  }
+});
+D = JSON.parse(localStorage.getItem('alarrab_sitedata') || 'null') || JSON.parse(JSON.stringify(DEFAULT_D));
+applyData();
+</script>
+</body>
+</html>

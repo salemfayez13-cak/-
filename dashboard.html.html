@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — مركز العراب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9A84C;--gold2:#E8D5A3;--gold3:#A07828;
+  --black:#0A0A0A;--char:#111;--panel:#161208;--panel2:#1e1810;--panel3:#252018;
+  --border:rgba(201,168,76,.22);--border2:rgba(201,168,76,.1);
+  --text:#f0e8d0;--soft:rgba(240,232,208,.5);
+  --red:#e05252;--green:#4caf72;--blue:#4a9fd4;--orange:#e8973a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--text);direction:rtl;min-height:100vh}
+a{text-decoration:none;color:inherit}
+input,textarea,select{font-family:'Cairo',sans-serif}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:3px}
+
+/* ─── LOGIN ─── */
+#login-screen{position:fixed;inset:0;background:var(--black);display:flex;align-items:center;justify-content:center;z-index:9999;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(201,168,76,.05),transparent)}
+#login-screen.hidden{display:none}
+.lbox{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:48px 44px;width:100%;max-width:400px;text-align:center;position:relative}
+.lbox::before,.lbox::after{content:'';position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.lbox::before{top:0}.lbox::after{bottom:0}
+.lbox-logo{height:72px;object-fit:contain;margin:0 auto 18px;display:block;filter:drop-shadow(0 0 20px rgba(201,168,76,.3))}
+.lbox h1{font-size:1.25rem;font-weight:900;color:var(--gold2);margin-bottom:4px}
+.lbox p{font-size:.75rem;color:var(--soft);margin-bottom:26px;letter-spacing:1.5px;text-transform:uppercase}
+.lf{margin-bottom:14px;text-align:right}
+.lf label{display:block;font-size:.75rem;font-weight:700;color:var(--soft);margin-bottom:6px;letter-spacing:.5px}
+.li{width:100%;padding:12px 14px;background:rgba(201,168,76,.05);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-size:.9rem;font-family:'Cairo',sans-serif;outline:none;transition:.2s}
+.li:focus{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.lbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);font-family:'Cairo',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:2px;cursor:pointer;margin-top:8px;transition:.25s;letter-spacing:.5px}
+.lbtn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.lerr{color:var(--red);font-size:.82rem;margin-top:10px;display:none;padding:8px;background:rgba(224,82,82,.1);border-radius:2px}
+.lhint{font-size:.7rem;color:rgba(201,168,76,.3);margin-top:14px}
+
+/* ─── LAYOUT ─── */
+#app{display:none;min-height:100vh;flex-direction:column}
+#app.show{display:flex}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.topbar-logo img{height:38px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(201,168,76,.2))}
+.topbar-title{font-size:.95rem;font-weight:900;color:var(--gold)}
+.topbar-title small{display:block;font-size:.62rem;color:var(--soft);font-weight:400;letter-spacing:1.5px;text-transform:uppercase}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.tbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:2px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid;transition:.2s;font-family:'Cairo',sans-serif}
+.tbtn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--black);border-color:var(--gold)}
+.tbtn-gold:hover{filter:brightness(1.08)}
+.tbtn-ghost{background:transparent;color:var(--soft);border-color:var(--border2)}
+.tbtn-ghost:hover{color:var(--gold);border-color:var(--border)}
+.tbtn-red{background:transparent;color:var(--red);border-color:rgba(224,82,82,.25)}
+.tbtn-red:hover{background:rgba(224,82,82,.1)}
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:30px;font-size:.84rem;font-weight:700;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast-ok{background:var(--green);color:#fff}
+.toast-err{background:var(--red);color:#fff}
+
+/* ─── BODY ─── */
+.admin-body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:215px;background:var(--panel);border-left:1px solid var(--border2);overflow-y:auto;flex-shrink:0}
+.sg-label{font-size:.63rem;font-weight:700;color:rgba(201,168,76,.35);letter-spacing:2px;text-transform:uppercase;padding:14px 18px 6px}
+.sbl{display:flex;align-items:center;gap:9px;padding:10px 18px;font-size:.82rem;font-weight:600;color:var(--soft);cursor:pointer;transition:.18s;border-right:2px solid transparent}
+.sbl:hover{color:var(--gold2);background:rgba(201,168,76,.05)}
+.sbl.active{color:var(--gold);background:rgba(201,168,76,.08);border-right-color:var(--gold)}
+.sbl-ico{font-size:.9rem;flex-shrink:0;width:18px;text-align:center}
+
+/* ─── CONTENT ─── */
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.tab{display:none}
+.tab.active{display:block}
+.tab-title{font-size:1.15rem;font-weight:900;color:var(--gold2);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+
+/* ─── CARDS ─── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.card-head{padding:13px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:rgba(201,168,76,.03)}
+.card-head h3{font-size:.87rem;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:7px}
+.card-body{padding:20px}
+
+/* ─── FORM ─── */
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:.75rem;font-weight:700;color:var(--soft);margin-bottom:6px;letter-spacing:.4px}
+.fi,.fta,.fsel{width:100%;padding:10px 13px;background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-size:.87rem;font-family:'Cairo',sans-serif;outline:none;transition:.2s;direction:rtl}
+.fi:focus,.fta:focus,.fsel:focus{border-color:var(--gold);background:rgba(201,168,76,.07)}
+.fta{resize:vertical;min-height:80px;line-height:1.7}
+.fsel option{background:var(--char)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fhint{font-size:.7rem;color:rgba(201,168,76,.35);margin-top:4px}
+.sm-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;font-size:.76rem;font-weight:700;border-radius:2px;cursor:pointer;border:1px solid;font-family:'Cairo',sans-serif;transition:.18s}
+.sm-gold{background:rgba(201,168,76,.1);color:var(--gold);border-color:var(--border2)}
+.sm-gold:hover{background:rgba(201,168,76,.2)}
+.sm-red{background:rgba(224,82,82,.08);color:var(--red);border-color:rgba(224,82,82,.2)}
+.sm-red:hover{background:rgba(224,82,82,.18)}
+.sm-green{background:rgba(76,175,114,.08);color:var(--green);border-color:rgba(76,175,114,.2)}
+
+/* ─── IMAGE UPLOAD ─── */
+.img-upload-area{border:2px dashed var(--border);border-radius:3px;padding:0;text-align:center;cursor:pointer;transition:.2s;background:rgba(201,168,76,.02);overflow:hidden;position:relative;min-height:120px;display:flex;align-items:center;justify-content:center}
+.img-upload-area:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.img-upload-area img{width:100%;height:100%;object-fit:cover;display:block}
+.img-upload-area img.empty{display:none}
+.upload-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(10,8,3,.7);opacity:0;transition:.2s}
+.img-upload-area:hover .upload-overlay{opacity:1}
+.img-upload-area .ph-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px}
+.img-upload-area .ph-state.hidden{display:none}
+.up-icon{font-size:1.8rem;opacity:.5}
+.up-txt{font-size:.75rem;color:var(--soft);font-weight:600}
+.up-badge{font-size:.65rem;color:rgba(201,168,76,.4);margin-top:2px}
+
+/* ─── ACCORDION ROWS ─── */
+.acc-row{background:rgba(201,168,76,.03);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.acc-head{display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;transition:.18s}
+.acc-head:hover{background:rgba(201,168,76,.06)}
+.acc-ico{font-size:1.1rem;width:28px;text-align:center}
+.acc-title{flex:1;font-size:.86rem;font-weight:700}
+.acc-toggle{color:var(--soft);font-size:.75rem;transition:.3s}
+.acc-row.open .acc-toggle{transform:rotate(90deg)}
+.acc-body{display:none;padding:16px;border-top:1px solid var(--border2)}
+.acc-row.open .acc-body{display:block}
+
+/* ─── ANALYTICS ─── */
+.stats-kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.kpi{background:var(--panel2);border:1px solid var(--border2);border-radius:3px;padding:16px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.kpi-gold::after{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.kpi-green::after{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.kpi-blue::after{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+.kpi-orange::after{background:linear-gradient(90deg,transparent,var(--orange),transparent)}
+.kpi-red::after{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.kpi h4{font-size:.68rem;color:var(--soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.kpi-val{font-size:1.9rem;font-weight:900;line-height:1;margin-bottom:3px}
+.kpi-gold .kpi-val{background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.kpi-green .kpi-val{color:var(--green)}
+.kpi-blue .kpi-val{color:var(--blue)}
+.kpi-orange .kpi-val{color:var(--orange)}
+.kpi-red .kpi-val{color:var(--red)}
+.kpi-lbl{font-size:.7rem;color:var(--soft)}
+.kpi-change{font-size:.7rem;margin-top:6px;display:flex;align-items:center;gap:4px}
+.kpi-change.up{color:var(--green)}
+.kpi-change.down{color:var(--red)}
+
+/* Chart bar */
+.chart-wrap{background:var(--panel2);border:1px solid var(--border2);border-radius:3px;padding:20px;margin-bottom:20px}
+.chart-title{font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:120px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:2px 2px 0 0;transition:height .5s ease;min-height:2px;cursor:pointer;position:relative}
+.bar:hover::after{content:attr(data-val);position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--gold2);white-space:nowrap;background:var(--panel);padding:2px 6px;border-radius:2px;border:1px solid var(--border2)}
+.bar-lbl{font-size:.62rem;color:var(--soft);text-align:center}
+.bar-views{background:linear-gradient(180deg,var(--gold),var(--gold3))}
+.bar-phone{background:linear-gradient(180deg,var(--green),#2d7a4f)}
+.bar-wa{background:linear-gradient(180deg,#25D366,#1a8f47)}
+
+/* Pages table */
+.pages-tbl{width:100%;border-collapse:collapse}
+.pages-tbl th{text-align:right;padding:9px 14px;font-size:.7rem;font-weight:700;color:var(--soft);border-bottom:1px solid var(--border2);letter-spacing:.5px;text-transform:uppercase}
+.pages-tbl td{padding:10px 14px;font-size:.82rem;border-bottom:1px solid var(--border2)}
+.pages-tbl tr:last-child td{border-bottom:none}
+.pages-tbl tr:hover td{background:rgba(201,168,76,.03)}
+.pg-bar{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.pg-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold3),var(--gold))}
+.badge-num{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+.badge-gold{background:rgba(201,168,76,.15);color:var(--gold)}
+.badge-green{background:rgba(76,175,114,.15);color:var(--green)}
+
+/* Click events list */
+.evt-list{display:flex;flex-direction:column;gap:8px}
+.evt-row{display:flex;align-items:center;gap:12px;padding:11px 16px;background:rgba(201,168,76,.03);border:1px solid var(--border2);border-radius:2px}
+.evt-icon{font-size:1.2rem;flex-shrink:0}
+.evt-info{flex:1}
+.evt-label{font-size:.84rem;font-weight:700}
+.evt-sub{font-size:.72rem;color:var(--soft);margin-top:2px}
+.evt-count{font-size:1.4rem;font-weight:900;color:var(--gold);flex-shrink:0}
+.evt-pct{font-size:.7rem;color:var(--soft);text-align:right;margin-top:2px}
+
+/* Reset btn */
+.analytics-actions{display:flex;gap:10px;margin-bottom:20px}
+
+/* ─── LINK TABLE ─── */
+.lnk-tbl{width:100%;border-collapse:collapse}
+.lnk-tbl th{text-align:right;padding:9px 14px;font-size:.7rem;font-weight:700;color:var(--soft);border-bottom:1px solid var(--border2);letter-spacing:.5px}
+.lnk-tbl td{padding:9px 14px;font-size:.82rem;border-bottom:1px solid var(--border2)}
+.lnk-tbl tr:last-child td{border-bottom:none}
+.lnk-tbl input{width:100%;padding:7px 10px;background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-size:.8rem;font-family:'Cairo',sans-serif;outline:none;direction:ltr}
+.lnk-tbl input:focus{border-color:var(--gold)}
+
+/* ─── COLOR PALETTE ─── */
+.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+.color-item{background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:2px;padding:14px;text-align:center}
+.color-swatch{width:44px;height:44px;border-radius:50%;margin:0 auto 9px;border:2px solid var(--border);cursor:pointer;transition:.2s;position:relative}
+.color-swatch:hover{transform:scale(1.1);border-color:var(--gold)}
+.color-item label{display:block;font-size:.72rem;color:var(--soft);margin-bottom:6px;font-weight:600}
+.color-hex{width:100%;padding:6px 9px;background:rgba(0,0,0,.3);border:1px solid var(--border2);border-radius:2px;color:var(--text);font-size:.78rem;font-family:monospace;text-align:center;outline:none;direction:ltr}
+.color-hex:focus{border-color:var(--gold)}
+.cpick{position:absolute;opacity:0;width:1px;height:1px;bottom:0;right:0}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:680px){
+  .sidebar{display:none}
+  .content{padding:16px}
+  .row2,.row3{grid-template-columns:1fr}
+  .stats-kpi{grid-template-columns:1fr 1fr}
+  .color-grid{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+ <div class="lbox">
+  <img src="Finaaaaal.png" class="lbox-logo" alt="logo" onerror="this.style.display='none'">
+  <h1>لوحة التحكم</h1>
+  <p>مركز العراب لطب الأسنان</p>
+  <div class="lf"><label>اسم المستخدم</label><input class="li" id="lu" type="text" placeholder="admin" autocomplete="username"></div>
+  <div class="lf"><label>كلمة المرور</label><input class="li" id="lp" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+  <button class="lbtn" onclick="doLogin()">دخول ←</button>
+  <div class="lerr" id="lerr">⚠️ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+  <div class="lhint">لوحة إدارة الموقع — <a href="alarrab-luxury.html" style="color:var(--gold)">العودة للموقع</a></div>
+ </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+ <div class="topbar">
+  <div class="topbar-logo">
+   <img src="Finaaaaal.png" alt="logo" onerror="this.style.display='none'">
+   <div class="topbar-title">لوحة التحكم <small>AL-ARAB ADMIN v3</small></div>
+  </div>
+  <div class="topbar-right">
+   <button class="tbtn tbtn-ghost" onclick="window.open('alarrab-luxury.html','_blank')">👁 معاينة</button>
+   <button class="tbtn tbtn-gold" onclick="saveAll()">💾 حفظ</button>
+   <button class="tbtn tbtn-red" onclick="doLogout()">خروج</button>
+  </div>
+ </div>
+
+ <div class="admin-body">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+   <div class="sg-label">الرئيسية</div>
+   <div class="sbl active" data-tab="analytics" onclick="showTab(this)"><span class="sbl-ico">📊</span>الإحصائيات</div>
+   <div class="sg-label">هوية المركز</div>
+   <div class="sbl" data-tab="identity" onclick="showTab(this)"><span class="sbl-ico">🏥</span>معلومات المركز</div>
+   <div class="sbl" data-tab="logo" onclick="showTab(this)"><span class="sbl-ico">🖼</span>الشعار</div>
+   <div class="sbl" data-tab="colors" onclick="showTab(this)"><span class="sbl-ico">🎨</span>الألوان</div>
+   <div class="sg-label">الصور</div>
+   <div class="sbl" data-tab="images" onclick="showTab(this)"><span class="sbl-ico">📸</span>إدارة الصور</div>
+   <div class="sg-label">المحتوى</div>
+   <div class="sbl" data-tab="services" onclick="showTab(this)"><span class="sbl-ico">⚕️</span>الخدمات</div>
+   <div class="sbl" data-tab="testimonials" onclick="showTab(this)"><span class="sbl-ico">⭐</span>آراء العملاء</div>
+   <div class="sbl" data-tab="faq" onclick="showTab(this)"><span class="sbl-ico">❓</span>الأسئلة الشائعة</div>
+   <div class="sbl" data-tab="stats-edit" onclick="showTab(this)"><span class="sbl-ico">📈</span>أرقام الصفحة الرئيسية</div>
+   <div class="sg-label">الإعدادات</div>
+   <div class="sbl" data-tab="links" onclick="showTab(this)"><span class="sbl-ico">🔗</span>الروابط</div>
+   <div class="sbl" data-tab="password" onclick="showTab(this)"><span class="sbl-ico">🔒</span>كلمة المرور</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+   <!-- ══ ANALYTICS ══ -->
+   <div class="tab active" id="tab-analytics">
+    <div class="tab-title">📊 إحصائيات الموقع</div>
+    <div class="analytics-actions">
+     <button class="tbtn tbtn-ghost" onclick="refreshStats()">🔄 تحديث</button>
+     <button class="tbtn tbtn-red" onclick="resetStats()">🗑 مسح الإحصائيات</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="stats-kpi" id="kpi-grid"></div>
+
+    <!-- Charts row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+     <div class="chart-wrap">
+      <div class="chart-title">📅 الزيارات اليومية (آخر 7 أيام)</div>
+      <div class="bar-chart" id="daily-chart"></div>
+     </div>
+     <div class="chart-wrap">
+      <div class="chart-title">📲 نقرات التواصل (آخر 7 أيام)</div>
+      <div class="bar-chart" id="contact-chart"></div>
+     </div>
+    </div>
+
+    <!-- Pages table -->
+    <div class="card">
+     <div class="card-head"><h3>📄 مشاهدات الصفحات</h3><span id="total-badge" class="badge-num badge-gold">0 زيارة</span></div>
+     <div class="card-body">
+      <table class="pages-tbl" id="pages-tbl">
+       <thead><tr><th>الصفحة</th><th>المشاهدات</th><th>النسبة</th><th>شريط</th></tr></thead>
+       <tbody id="pages-tbody"></tbody>
+      </table>
+     </div>
+    </div>
+
+    <!-- Click events -->
+    <div class="card">
+     <div class="card-head"><h3>🖱 أحداث النقر والتفاعل</h3></div>
+     <div class="card-body">
+      <div class="evt-list" id="evt-list"></div>
+     </div>
+    </div>
+
+    <!-- Sources / info -->
+    <div class="card">
+     <div class="card-head"><h3>ℹ️ معلومات</h3></div>
+     <div class="card-body">
+      <div style="font-size:.83rem;color:var(--soft);line-height:1.9">
+       <p>• الإحصائيات تُسجَّل محلياً في متصفح الزائر — تعمل بدون سيرفر خارجي</p>
+       <p>• لاحصائيات أكثر دقة وشمولاً، يُنصح بربط Google Analytics أو Meta Pixel من قسم الروابط</p>
+       <p>• يتم تتبع: مشاهدات الصفحات، نقرات الواتساب، نقرات الهاتف، نقرات الإيميل، نقرات الخريطة</p>
+       <p>• آخر تحديث: <span id="last-update">—</span></p>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <!-- ══ IDENTITY ══ -->
+   <div class="tab" id="tab-identity">
+    <div class="tab-title">🏥 معلومات المركز</div>
+    <div class="card">
+     <div class="card-head"><h3>📋 البيانات الأساسية</h3></div>
+     <div class="card-body">
+      <div class="row2">
+       <div class="fg"><label>اسم المركز (عربي)</label><input class="fi" id="c-name" value="مركز العراب لطب الأسنان"></div>
+       <div class="fg"><label>اسم المركز (إنجليزي)</label><input class="fi" id="c-nameen" value="AL-ARAB DENTAL" dir="ltr"></div>
+      </div>
+      <div class="row2">
+       <div class="fg"><label>رقم الهاتف</label><input class="fi" id="c-phone" value="01070570222" dir="ltr"></div>
+       <div class="fg"><label>البريد الإلكتروني</label><input class="fi" id="c-email" value="info@alarrabclinic.com" dir="ltr"></div>
+      </div>
+      <div class="fg"><label>رابط واتساب</label><input class="fi" id="c-wa" value="https://wa.link/sy35gh" dir="ltr"><div class="fhint">مثال: https://wa.link/xxxxx</div></div>
+      <div class="fg"><label>العنوان</label><textarea class="fta" id="c-addr" rows="2">مصر الجديدة، ميدان سانت فاتيما، اعلى المصرف المتحد، الدور الثالث، شقة 1</textarea></div>
+      <div class="fg"><label>رابط الخريطة</label><input class="fi" id="c-map" value="https://maps.app.goo.gl/z2UMErDs838cyhpu7" dir="ltr"></div>
+     </div>
+    </div>
+    <div class="card">
+     <div class="card-head"><h3>✍️ نصوص الصفحة الرئيسية</h3></div>
+     <div class="card-body">
+      <div class="fg"><label>عنوان Hero الرئيسي</label><input class="fi" id="hero-title" value="ابتسامتك تستحق الأفضل"></div>
+      <div class="fg"><label>وصف Hero</label><textarea class="fta" id="hero-desc">يضم مركز العراب نخبة من أفضل أطباء الأسنان المؤهلين وذوي خبرة في علاج وتجميل الأسنان باستخدام أحدث التقنيات والأجهزة الطبية.</textarea></div>
+      <div class="fg"><label>نص "لماذا تختار العراب؟"</label><textarea class="fta" id="why-desc">عيادة العراب هي واحدة من أبرز عيادات الأسنان المتخصصة في تجميل وزراعة الأسنان في مصر، تتميز بأعلى معايير الجودة والكفاءة.</textarea></div>
+      <div class="fg"><label>نص مهمتنا (صفحة "من نحن")</label><textarea class="fta" id="mission-txt" rows="4">تتمثل مهمتنا في مركز العراب في تحسين صحة وجمال الأسنان لمرضانا وتعزيز الوعي الصحي. نحن نسعى جاهدين لتوفير علاجات شاملة ومبتكرة لمشاكل الفم والأسنان.</textarea></div>
+     </div>
+    </div>
+   </div>
+
+   <!-- ══ LOGO ══ -->
+   <div class="tab" id="tab-logo">
+    <div class="tab-title">🖼 الشعار</div>
+    <div class="card">
+     <div class="card-head"><h3>🖼 شعار المركز</h3></div>
+     <div class="card-body">
+      <div class="row2">
+       <div>
+        <div class="fg"><label>رفع شعار جديد</label>
+         <div class="img-upload-area" style="height:160px" onclick="document.getElementById('logo-file').click()">
+          <img id="logo-preview" src="Finaaaaal.png" alt="" onerror="this.classList.add('empty')">
+          <div class="upload-overlay"><div style="font-size:1.5rem">📤</div><div style="font-size:.78rem;color:var(--gold2);font-weight:700">تغيير الشعار</div></div>
+          <div class="ph-state hidden"><div class="up-icon">🖼</div><div class="up-txt">اضغط لرفع شعار</div><div class="up-badge">PNG أو SVG بخلفية شفافة</div></div>
+         </div>
+         <input type="file" id="logo-file" accept="image/*" style="display:none" onchange="uploadImg(this,'logo-preview','c-logo-src')">
+        </div>
+        <div class="fg"><label>مسار الشعار</label><input class="fi" id="c-logo-src" value="Finaaaaal.png" dir="ltr"></div>
+       </div>
+       <div>
+        <div class="fg"><label>معاينة على خلفية داكنة</label>
+         <div style="background:var(--black);border:1px solid var(--border);border-radius:3px;height:160px;display:flex;align-items:center;justify-content:center;padding:20px">
+          <img id="logo-preview2" src="Finaaaaal.png" style="max-height:120px;object-fit:contain;filter:drop-shadow(0 0 15px rgba(201,168,76,.3))" onerror="this.style.display='none'">
+         </div>
+        </div>
+        <div class="fg"><label>معاينة على خلفية فاتحة</label>
+         <div style="background:#f9f5ed;border:1px solid var(--border);border-radius:3px;height:80px;display:flex;align-items:center;justify-content:center;padding:16px">
+          <img id="logo-preview3" src="Finaaaaal.png" style="max-height:56px;object-fit:contain" onerror="this.style.display='none'">
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <!-- ══ COLORS ══ -->
+   <div class="tab" id="tab-colors">
+    <div class="tab-title">🎨 الألوان والتصميم</div>
+    <div class="card">
+     <div class="card-head"><h3>✦ لوحة الألوان</h3><button class="sm-btn sm-gold" onclick="resetColors()">↺ استعادة الافتراضي</button></div>
+     <div class="card-body">
+      <div class="color-grid" id="color-grid"></div>
+     </div>
+    </div>
+   </div>
+
+   <!-- ══ IMAGES ══ -->
+   <div class="tab" id="tab-images">
+    <div class="tab-title">📸 إدارة الصور</div>
+
+    <!-- Hero image -->
+    <div class="card">
+     <div class="card-head"><h3>🏠 صورة الصفحة الرئيسية (Hero)</h3></div>
+     <div class="card-body">
+      <div class="row2">
+       <div>
+        <div class="fg"><label>الصورة الرئيسية (تظهر في البطاقة الجانبية)</label>
+         <div class="img-upload-area" style="height:200px" onclick="document.getElementById('hero-img-file').click()">
+          <img id="hero-img-preview" src="" alt="" class="empty">
+          <div class="upload-overlay"><div style="font-size:1.5rem">📤</div><div style="font-size:.78rem;color:var(--gold2);font-weight:700">رفع صورة</div></div>
+          <div class="ph-state"><div class="up-icon">🏥</div><div class="up-txt">صورة المركز الرئيسية</div><div class="up-badge">JPG / PNG / WEBP</div></div>
+         </div>
+         <input type="file" id="hero-img-file" accept="image/*" style="display:none" onchange="uploadImg(this,'hero-img-preview','hero-img-src',true)">
+        </div>
+        <div class="fg"><label>أو أدخل رابط الصورة</label><input class="fi" id="hero-img-src" placeholder="https://... أو مسار محلي" dir="ltr" onchange="previewFromUrl(this,'hero-img-preview')"></div>
+       </div>
+       <div style="background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:3px;padding:14px">
+        <div style="font-size:.75rem;color:var(--soft);margin-bottom:10px;font-weight:700">📐 تعليمات الصور</div>
+        <ul style="font-size:.75rem;color:var(--soft);list-style:none;line-height:2">
+         <li>• الأبعاد الموصى بها: <strong style="color:var(--gold)">800×600 px</strong></li>
+         <li>• الصيغ المدعومة: JPG, PNG, WEBP</li>
+         <li>• الحجم الأقصى: 5MB</li>
+         <li>• الصور تُخزَّن كـ Base64 محلياً</li>
+         <li>• للصور الكبيرة يُنصح برفعها على<br>&nbsp;&nbsp;Cloudinary أو ImgBB وإدخال الرابط</li>
+        </ul>
+       </div>
+      </div>
+     </div>
+    </div>
+
+    <!-- Why / About images -->
+    <div class="card">
+     <div class="card-head"><h3>ℹ️ صور قسم "من نحن"</h3></div>
+     <div class="card-body">
+      <div class="row2">
+       <div>
+        <div class="fg"><label>صورة جانب النص (الرئيسية)</label>
+         <div class="img-upload-area" style="height:160px" onclick="document.getElementById('why-img-file').click()">
+          <img id="why-img-preview" src="" alt="" class="empty">
+          <div class="upload-overlay"><div style="font-size:1.3rem">📤</div><div style="font-size:.75rem;color:var(--gold2);font-weight:700">رفع</div></div>
+          <div class="ph-state"><div class="up-icon">🦷</div><div class="up-txt">صورة جانب "لماذا العراب"</div></div>
+         </div>
+         <input type="file" id="why-img-file" accept="image/*" style="display:none" onchange="uploadImg(this,'why-img-preview','why-img-src',true)">
+        </div>
+        <div class="fg"><label>أو رابط</label><input class="fi" id="why-img-src" placeholder="رابط الصورة" dir="ltr" onchange="previewFromUrl(this,'why-img-preview')"></div>
+       </div>
+       <div>
+        <div class="fg"><label>صورة صفحة "من نحن"</label>
+         <div class="img-upload-area" style="height:160px" onclick="document.getElementById('about-img-file').click()">
+          <img id="about-img-preview" src="" alt="" class="empty">
+          <div class="upload-overlay"><div style="font-size:1.3rem">📤</div><div style="font-size:.75rem;color:var(--gold2);font-weight:700">رفع</div></div>
+          <div class="ph-state"><div class="up-icon">🏥</div><div class="up-txt">صورة صفحة "من نحن"</div></div>
+         </div>
+         <input type="file" id="about-img-file" accept="image/*" style="display:none" onchange="uploadImg(this,'about-img-preview','about-img-src',true)">
+        </div>
+        <div class="fg"><label>أو رابط</label><input class="fi" id="about-img-src" placeholder="رابط الصورة" dir="ltr" onchange="previewFromUrl(this,'about-img-preview')"></div>
+       </div>
+      </div>
+     </div>
+    </div>
+
+    <!-- Service images -->
+    <div class="card">
+     <div class="card-head"><h3>⚕️ صور الخدمات</h3></div>
+     <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px" id="svc-imgs-grid"></div>
+     </div>
+    </div>
+   </div>
+
+   <!-- ══ SERVICES ══ -->
+   <div class="tab" id="tab-services">
+    <div class="tab-title">⚕️ الخدمات</div>
+    <div class="card">
+     <div class="card-head"><h3>⚕️ قائمة الخدمات</h3><button class="sm-btn sm-gold" onclick="addService()">+ إضافة</button></div>
+     <div class="card-body"><div id="svc-list"></div></div>
+    </div>
+   </div>
+
+   <!-- ══ TESTIMONIALS ══ -->
+   <div class="tab" id="tab-testimonials">
+    <div class="tab-title">⭐ آراء العملاء</div>
+    <div class="card">
+     <div class="card-head"><h3>⭐ التقييمات</h3><button class="sm-btn sm-gold" onclick="addTesti()">+ إضافة</button></div>
+     <div class="card-body"><div id="testi-list"></div></div>
+    </div>
+   </div>
+
+   <!-- ══ FAQ ══ -->
+   <div class="tab" id="tab-faq">
+    <div class="tab-title">❓ الأسئلة الشائعة</div>
+    <div class="card">
+     <div class="card-head"><h3>❓ الأسئلة والأجوبة</h3><button class="sm-btn sm-gold" onclick="addFaq()">+ إضافة</button></div>
+     <div class="card-body"><div id="faq-list"></div></div>
+    </div>
+   </div>
+
+   <!-- ══ STATS EDIT ══ -->
+   <div class="tab" id="tab-stats-edit">
+    <div class="tab-title">📈 أرقام الصفحة الرئيسية</div>
+    <div class="card">
+     <div class="card-head"><h3>📈 الإحصائيات المعروضة</h3></div>
+     <div class="card-body"><div class="row2" id="stats-edit-grid"></div></div>
+    </div>
+   </div>
+
+   <!-- ══ LINKS ══ -->
+   <div class="tab" id="tab-links">
+    <div class="tab-title">🔗 الروابط</div>
+    <div class="card">
+     <div class="card-head"><h3>🔗 روابط التواصل</h3></div>
+     <div class="card-body">
+      <table class="lnk-tbl">
+       <thead><tr><th>المنصة</th><th>الرابط / القيمة</th></tr></thead>
+       <tbody>
+        <tr><td>💬 واتساب</td><td><input id="lnk-wa" value="https://wa.link/sy35gh"></td></tr>
+        <tr><td>📞 هاتف</td><td><input id="lnk-phone" value="tel:01070570222"></td></tr>
+        <tr><td>✉️ إيميل</td><td><input id="lnk-email" value="mailto:info@alarrabclinic.com"></td></tr>
+        <tr><td>📍 خريطة</td><td><input id="lnk-map" value="https://maps.app.goo.gl/z2UMErDs838cyhpu7"></td></tr>
+        <tr><td>📘 فيسبوك</td><td><input id="lnk-fb" placeholder="https://facebook.com/..."></td></tr>
+        <tr><td>📸 إنستجرام</td><td><input id="lnk-ig" placeholder="https://instagram.com/..."></td></tr>
+        <tr><td>🎵 تيك توك</td><td><input id="lnk-tt" placeholder="https://tiktok.com/..."></td></tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="card">
+     <div class="card-head"><h3>🔌 أكواد التتبع والتضمين</h3></div>
+     <div class="card-body">
+      <div class="fg"><label>Google Analytics / Tag Manager</label><textarea class="fta" id="analytics-code" rows="4" dir="ltr" placeholder="&lt;!-- Google Tag Manager --&gt;&#10;&lt;script&gt;...&lt;/script&gt;"></textarea><div class="fhint">يُضاف تلقائياً في head الموقع عند الحفظ</div></div>
+      <div class="fg"><label>Facebook / Meta Pixel</label><textarea class="fta" id="fb-pixel" rows="4" dir="ltr" placeholder="&lt;!-- Meta Pixel Code --&gt;&#10;&lt;script&gt;...&lt;/script&gt;"></textarea></div>
+      <div class="fg"><label>تضمين خريطة Google Maps (iframe)</label><textarea class="fta" id="map-embed" rows="3" dir="ltr" placeholder='&lt;iframe src="https://www.google.com/maps/embed?..."&gt;&lt;/iframe&gt;'></textarea></div>
+     </div>
+    </div>
+   </div>
+
+   <!-- ══ PASSWORD ══ -->
+   <div class="tab" id="tab-password">
+    <div class="tab-title">🔒 تغيير بيانات الدخول</div>
+    <div class="card" style="max-width:440px">
+     <div class="card-head"><h3>🔒 تغيير الباسوورد</h3></div>
+     <div class="card-body">
+      <div class="fg"><label>اسم المستخدم الجديد</label><input class="fi" id="new-user" placeholder="admin"></div>
+      <div class="fg"><label>كلمة المرور الحالية</label><input class="fi" id="cur-pass" type="password" placeholder="••••••••"></div>
+      <div class="fg"><label>كلمة المرور الجديدة</label><input class="fi" id="new-pass" type="password" placeholder="••••••••"></div>
+      <div class="fg"><label>تأكيد كلمة المرور</label><input class="fi" id="conf-pass" type="password" placeholder="••••••••"></div>
+      <button class="tbtn tbtn-gold" style="width:100%;justify-content:center;margin-top:6px" onclick="changePass()">تحديث بيانات الدخول</button>
+      <div id="pass-msg" style="margin-top:10px;font-size:.82rem;display:none"></div>
+     </div>
+    </div>
+   </div>
+
+  </div><!-- /content -->
+ </div><!-- /admin-body -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// AUTH
+// ════════════════════════════════
+let creds = JSON.parse(localStorage.getItem('alarrab_creds')||'{"user":"admin","pass":"alarrab2024"}');
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  if(u===creds.user&&p===creds.pass){
+    localStorage.setItem('alarrab_sess','1');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('show');
+    initApp();
+  } else {
+    const e=document.getElementById('lerr');e.style.display='block';
+    setTimeout(()=>e.style.display='none',3000);
+  }
+}
+function doLogout(){localStorage.removeItem('alarrab_sess');location.reload()}
+document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+if(localStorage.getItem('alarrab_sess')){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('show');
+  initApp();
+}
+function changePass(){
+  const cur=document.getElementById('cur-pass').value;
+  const np=document.getElementById('new-pass').value;
+  const cp=document.getElementById('conf-pass').value;
+  const nu=document.getElementById('new-user').value.trim()||creds.user;
+  const msg=document.getElementById('pass-msg');
+  if(cur!==creds.pass){msg.style.display='block';msg.style.color='var(--red)';msg.textContent='⚠️ كلمة المرور الحالية غير صحيحة';return}
+  if(np!==cp){msg.style.display='block';msg.style.color='var(--red)';msg.textContent='⚠️ كلمة المرور الجديدة غير متطابقة';return}
+  if(np.length<6){msg.style.display='block';msg.style.color='var(--red)';msg.textContent='⚠️ الباسوورد 6 أحرف على الأقل';return}
+  creds={user:nu,pass:np};localStorage.setItem('alarrab_creds',JSON.stringify(creds));
+  msg.style.display='block';msg.style.color='var(--green)';msg.textContent='✓ تم التحديث بنجاح';
+  ['cur-pass','new-pass','conf-pass'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ════════════════════════════════
+// DATA
+// ════════════════════════════════
+const DEF = {
+  clinic:{name:'مركز العراب لطب الأسنان',nameEn:'AL-ARAB DENTAL',phone:'01070570222',whatsapp:'https://wa.link/sy35gh',email:'info@alarrabclinic.com',address:'مصر الجديدة، ميدان سانت فاتيما، اعلى المصرف المتحد، الدور الثالث، شقة 1',mapUrl:'https://maps.app.goo.gl/z2UMErDs838cyhpu7',logoSrc:'Finaaaaal.png'},
+  hero:{title:'ابتسامتك تستحق الأفضل',desc:'يضم مركز العراب نخبة من أفضل أطباء الأسنان المؤهلين وذوي خبرة.',img:''},
+  about:{img:'',missionText:'تتمثل مهمتنا في مركز العراب في تحسين صحة وجمال الأسنان لمرضانا وتعزيز الوعي الصحي.'},
+  whyImg:'',
+  stats:[{num:'+1000',label:'مريض راضٍ'},{num:'8',label:'خدمات'},{num:'+10',label:'سنوات خبرة'},{num:'100%',label:'رضا تام'}],
+  services:[
+    {id:'cosmetic',icon:'✨',title:'تجميل الأسنان',desc:'إجراء تجميلي للأسنان يهدف إلى تحقيق ابتسامة هوليود.',img:''},
+    {id:'implants2',icon:'🔬',title:'زراعة الأسنان',desc:'إجراء جراحي يهدف إلى استبدال الأسنان المفقودة بأسنان صناعية ثابتة.',img:''},
+    {id:'implants',icon:'👑',title:'تركيب الاسنان',desc:'إجراء يهدف إلى استبدال الأسنان المفقودة أو التالفة بقطع صناعية.',img:''},
+    {id:'nerve',icon:'💉',title:'حشو العصب',desc:'إجراء طبي يتم تنفيذه في عيادة الأسنان لعلاج تلف العصب.',img:''},
+    {id:'ortho',icon:'😁',title:'تقويم الاسنان',desc:'أسلوب علاجي متقدم يساعد على تحسين شكل الاسنان.',img:''},
+    {id:'fillings',icon:'🦷',title:'الحشوات التجميلية',desc:'حشوات ذات لون يتطابق مع لون الأسنان.',img:''},
+    {id:'gum',icon:'🌿',title:'تجميل اللثة',desc:'إجراء لتحسين مظهر وشكل اللثة المحيطة بالأسنان.',img:''},
+    {id:'kids',icon:'👶',title:'طب اسنان الأطفال',desc:'رعاية متخصصة تختلف عن رعاية أسنان البالغين.',img:''}
+  ],
+  testimonials:[
+    {name:'خالد جمال',role:'تجميل أسنان',text:'تجربة رائعة جداً، الأطباء محترفون والخدمة ممتازة.'},
+    {name:'يمني محمد',role:'تبييض أسنان',text:'مركز متميز ونظيف جداً، الأطباء ذوو خبرة عالية والتعامل راقي.'},
+    {name:'محمد مجدي',role:'زراعة أسنان',text:'عملت زراعة أسنان وكانت تجربة ممتازة والنتيجة طبيعية.'},
+    {name:'مني مصطفى',role:'تقويم أسنان',text:'أفضل مركز أسنان زرته في حياتي! النتائج مذهلة.'},
+    {name:'أحمد ياسر',role:'ابتسامة هوليوود',text:'الدكاترة متخصصون وأكفاء، المركز مجهز بأحدث الأجهزة.'}
+  ],
+  faq:[
+    {q:'كيف يمكنني الحفاظ على صحة الأسنان الجيدة؟',a:'تنظيف الأسنان مرتين يوميًا، استخدام خيط الأسنان، الابتعاد عن التدخين، الحمية الغذائية الصحية، وزيارة طبيب الأسنان كل ستة أشهر.'},
+    {q:'ما هو التسوس وكيف يمكن علاجه؟',a:'تسوس الأسنان يُعالج بالفلورايد، الحشوات، علاج عصب السن، أو التاج الكامل حسب الدرجة.'},
+    {q:'ما هي أعراض التهاب اللثة؟',a:'احمرار اللثة وتورمها، النزيف عند التنظيف، رائحة الفم الكريهة، والألم في المنطقة الملتهبة.'},
+    {q:'ما هي الأسباب الشائعة لسقوط مسمار زراعة الأسنان؟',a:'عدم التكامل العظمي، التهاب اللثة المزمن، الضغط الزائد، ومشكلات في التصميم أو التركيب.'}
+  ],
+  colors:{
+    '--gold':'#C9A84C','--gold2':'#E8D5A3','--gold3':'#A07828',
+    '--gold4':'#F5EDD4','--black':'#0A0A0A',
+    '--offwhite':'#F9F5ED','--warmwhite':'#FFFDF7'
+  }
+};
+let D = JSON.parse(localStorage.getItem('alarrab_sitedata')||'null') || JSON.parse(JSON.stringify(DEF));
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+function initApp(){
+  loadFormValues();
+  renderSvcList();
+  renderTestiList();
+  renderFaqList();
+  renderStatsEdit();
+  renderColorGrid();
+  renderSvcImgGrid();
+  loadImages();
+  refreshStats();
+}
+
+// ════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════
+function showTab(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sbl').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+el.dataset.tab).classList.add('active');
+}
+
+// ════════════════════════════════
+// FORM VALUES
+// ════════════════════════════════
+function loadFormValues(){
+  const c=D.clinic;
+  setVal('c-name',c.name);setVal('c-nameen',c.nameEn);
+  setVal('c-phone',c.phone);setVal('c-email',c.email);
+  setVal('c-wa',c.whatsapp);setVal('c-addr',c.address);setVal('c-map',c.mapUrl);
+  setVal('c-logo-src',c.logoSrc);
+  setVal('hero-title',D.hero?.title||'');setVal('hero-desc',D.hero?.desc||'');
+  setVal('why-desc',D.whyDesc||'');setVal('mission-txt',D.about?.missionText||'');
+  setVal('lnk-wa',c.whatsapp);setVal('lnk-phone','tel:'+c.phone);
+  setVal('lnk-email','mailto:'+c.email);setVal('lnk-map',c.mapUrl);
+  // Logo preview
+  if(c.logoSrc){['logo-preview','logo-preview2','logo-preview3'].forEach(id=>{const el=document.getElementById(id);if(el){el.src=c.logoSrc;el.classList.remove('empty')}})}
+}
+function setVal(id,val){const el=document.getElementById(id);if(el&&val!==undefined)el.value=val}
+function getVal(id){const el=document.getElementById(id);return el?el.value.trim():''}
+
+// ════════════════════════════════
+// IMAGES
+// ════════════════════════════════
+function loadImages(){
+  previewLoad('hero-img-preview',D.hero?.img,'hero-img-src');
+  previewLoad('why-img-preview',D.whyImg,'why-img-src');
+  previewLoad('about-img-preview',D.about?.img,'about-img-src');
+  D.services.forEach(s=>{
+    const pr=document.getElementById('svc-img-prev-'+s.id);
+    const ph=document.getElementById('svc-img-ph-'+s.id);
+    const si=document.getElementById('svc-img-src-'+s.id);
+    if(s.img&&pr){pr.src=s.img;pr.classList.remove('empty');if(ph)ph.classList.add('hidden');if(si)si.value=s.img}
+  });
+}
+function previewLoad(previewId,src,srcId){
+  if(!src)return;
+  const pr=document.getElementById(previewId);
+  const si=document.getElementById(srcId);
+  if(pr){pr.src=src;pr.classList.remove('empty');const ph=pr.parentElement.querySelector('.ph-state');if(ph)ph.classList.add('hidden');}
+  if(si)si.value=src;
+}
+function uploadImg(input,previewId,srcId,isLarge){
+  if(!input.files||!input.files[0])return;
+  const f=input.files[0];
+  if(f.size>5*1024*1024){showToast('⚠️ حجم الصورة يتجاوز 5MB','err');return}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=e.target.result;
+    const pr=document.getElementById(previewId);
+    const si=document.getElementById(srcId);
+    if(pr){pr.src=data;pr.classList.remove('empty');const ph=pr.parentElement.querySelector('.ph-state');if(ph)ph.classList.add('hidden');}
+    if(si)si.value=data;
+    // Also update logo previews if it's the logo
+    if(previewId==='logo-preview'){['logo-preview2','logo-preview3'].forEach(id=>{const el=document.getElementById(id);if(el){el.src=data;el.style.display=''}})}
+  };
+  reader.readAsDataURL(f);
+}
+function previewFromUrl(input,previewId){
+  const pr=document.getElementById(previewId);
+  if(pr&&input.value){pr.src=input.value;pr.classList.remove('empty');const ph=pr.parentElement.querySelector('.ph-state');if(ph)ph.classList.add('hidden');}
+}
+function uploadSvcImg(input,svcId){
+  if(!input.files||!input.files[0])return;
+  if(input.files[0].size>5*1024*1024){showToast('⚠️ حجم الصورة يتجاوز 5MB','err');return}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=e.target.result;
+    const pr=document.getElementById('svc-img-prev-'+svcId);
+    const ph=document.getElementById('svc-img-ph-'+svcId);
+    const si=document.getElementById('svc-img-src-'+svcId);
+    if(pr){pr.src=data;pr.classList.remove('empty');}
+    if(ph)ph.classList.add('hidden');
+    if(si)si.value=data;
+    const svc=D.services.find(s=>s.id===svcId);
+    if(svc)svc.img=data;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function renderSvcImgGrid(){
+  const el=document.getElementById('svc-imgs-grid');
+  if(!el)return;
+  el.innerHTML=D.services.map(s=>`
+  <div style="background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:3px;overflow:hidden">
+   <div class="img-upload-area" style="height:130px" onclick="document.getElementById('svc-file-${s.id}').click()">
+    <img id="svc-img-prev-${s.id}" src="${s.img||''}" alt="" class="${s.img?'':'empty'}">
+    <div class="upload-overlay"><div style="font-size:1.2rem">📤</div><div style="font-size:.72rem;color:var(--gold2);font-weight:700">رفع</div></div>
+    <div class="ph-state ${s.img?'hidden':''}"><div class="up-icon">${s.icon}</div><div class="up-txt">${s.title}</div></div>
+    <div id="svc-img-ph-${s.id}"></div>
+   </div>
+   <input type="file" id="svc-file-${s.id}" accept="image/*" style="display:none" onchange="uploadSvcImg(this,'${s.id}')">
+   <div style="padding:10px 12px">
+    <div style="font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:6px">${s.icon} ${s.title}</div>
+    <input class="fi" id="svc-img-src-${s.id}" placeholder="أو أدخل رابط الصورة" style="font-size:.75rem;padding:6px 9px" dir="ltr" value="${s.img||''}" onchange="updateSvcImgFromUrl(this,'${s.id}')">
+   </div>
+  </div>`).join('');
+}
+function updateSvcImgFromUrl(input,svcId){
+  const svc=D.services.find(s=>s.id===svcId);
+  if(svc&&input.value){
+    svc.img=input.value;
+    const pr=document.getElementById('svc-img-prev-'+svcId);
+    const ph=document.getElementById('svc-img-ph-'+svcId);
+    if(pr){pr.src=input.value;pr.classList.remove('empty');}
+    if(ph)ph.classList.add('hidden');
+  }
+}
+
+// ════════════════════════════════
+// SERVICES
+// ════════════════════════════════
+function renderSvcList(){
+  document.getElementById('svc-list').innerHTML=D.services.map((s,i)=>`
+  <div class="acc-row" id="sacc-${i}">
+   <div class="acc-head" onclick="toggleAcc('sacc-${i}')">
+    <div class="acc-ico">${s.icon}</div><div class="acc-title">${s.title}</div>
+    <button class="sm-btn sm-red" onclick="event.stopPropagation();delService(${i})" style="margin-left:8px">حذف</button>
+    <div class="acc-toggle">▶</div>
+   </div>
+   <div class="acc-body">
+    <div class="row2">
+     <div class="fg"><label>الأيقونة</label><input class="fi" value="${s.icon}" onchange="D.services[${i}].icon=this.value" style="font-size:1.2rem;text-align:center"></div>
+     <div class="fg"><label>العنوان</label><input class="fi" value="${s.title}" onchange="D.services[${i}].title=this.value"></div>
+    </div>
+    <div class="fg"><label>الوصف القصير (في الكارد)</label><textarea class="fta" rows="2" onchange="D.services[${i}].desc=this.value">${s.desc}</textarea></div>
+    <div class="fhint">💡 لتغيير صورة الخدمة اذهب إلى قسم "إدارة الصور"</div>
+   </div>
+  </div>`).join('');
+}
+function addService(){D.services.push({id:'svc-'+Date.now(),icon:'⚕️',title:'خدمة جديدة',desc:'وصف الخدمة الجديدة.',img:''});renderSvcList();renderSvcImgGrid()}
+function delService(i){if(confirm('حذف هذه الخدمة؟')){D.services.splice(i,1);renderSvcList();renderSvcImgGrid()}}
+
+// ════════════════════════════════
+// TESTIMONIALS
+// ════════════════════════════════
+function renderTestiList(){
+  document.getElementById('testi-list').innerHTML=D.testimonials.map((t,i)=>`
+  <div class="acc-row" id="tacc-${i}">
+   <div class="acc-head" onclick="toggleAcc('tacc-${i}')">
+    <div class="acc-ico" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:900;color:var(--black)">${t.name.charAt(0)}</div>
+    <div class="acc-title">${t.name}</div>
+    <button class="sm-btn sm-red" onclick="event.stopPropagation();delTesti(${i})" style="margin-left:8px">حذف</button>
+    <div class="acc-toggle">▶</div>
+   </div>
+   <div class="acc-body">
+    <div class="row2">
+     <div class="fg"><label>الاسم</label><input class="fi" value="${t.name}" onchange="D.testimonials[${i}].name=this.value"></div>
+     <div class="fg"><label>الخدمة / الدور</label><input class="fi" value="${t.role}" onchange="D.testimonials[${i}].role=this.value"></div>
+    </div>
+    <div class="fg"><label>نص التقييم</label><textarea class="fta" rows="2" onchange="D.testimonials[${i}].text=this.value">${t.text}</textarea></div>
+   </div>
+  </div>`).join('');
+}
+function addTesti(){D.testimonials.push({name:'اسم العميل',role:'الخدمة',text:'نص التقييم...'});renderTestiList()}
+function delTesti(i){if(confirm('حذف هذا التقييم؟')){D.testimonials.splice(i,1);renderTestiList()}}
+
+// ════════════════════════════════
+// FAQ
+// ════════════════════════════════
+function renderFaqList(){
+  document.getElementById('faq-list').innerHTML=D.faq.map((f,i)=>`
+  <div class="acc-row" id="facc-${i}">
+   <div class="acc-head" onclick="toggleAcc('facc-${i}')">
+    <div class="acc-ico">❓</div><div class="acc-title">${f.q.substring(0,50)}${f.q.length>50?'...':''}</div>
+    <button class="sm-btn sm-red" onclick="event.stopPropagation();delFaq(${i})" style="margin-left:8px">حذف</button>
+    <div class="acc-toggle">▶</div>
+   </div>
+   <div class="acc-body">
+    <div class="fg"><label>السؤال</label><input class="fi" value="${f.q}" onchange="D.faq[${i}].q=this.value"></div>
+    <div class="fg"><label>الجواب</label><textarea class="fta" rows="3" onchange="D.faq[${i}].a=this.value">${f.a}</textarea></div>
+   </div>
+  </div>`).join('');
+}
+function addFaq(){D.faq.push({q:'السؤال الجديد؟',a:'الجواب هنا...'});renderFaqList()}
+function delFaq(i){if(confirm('حذف هذا السؤال؟')){D.faq.splice(i,1);renderFaqList()}}
+
+// ════════════════════════════════
+// STATS EDIT
+// ════════════════════════════════
+function renderStatsEdit(){
+  document.getElementById('stats-edit-grid').innerHTML=D.stats.map((s,i)=>`
+  <div style="background:rgba(201,168,76,.04);border:1px solid var(--border2);border-radius:2px;padding:16px">
+   <div class="fg"><label>الرقم</label><input class="fi" value="${s.num}" onchange="D.stats[${i}].num=this.value" style="font-weight:900;font-size:1.1rem;text-align:center"></div>
+   <div class="fg"><label>التسمية</label><input class="fi" value="${s.label}" onchange="D.stats[${i}].label=this.value" style="text-align:center"></div>
+  </div>`).join('');
+}
+
+// ════════════════════════════════
+// COLORS
+// ════════════════════════════════
+const COLOR_LABELS={'--gold':'الذهبي الأساسي','--gold2':'الذهبي الفاتح','--gold3':'الذهبي الداكن','--gold4':'الكريمي الذهبي','--black':'الخلفية السوداء','--offwhite':'الأبيض الدافئ','--warmwhite':'الأبيض الكريمي'};
+function renderColorGrid(){
+  document.getElementById('color-grid').innerHTML=Object.entries(D.colors).map(([k,v])=>`
+  <div class="color-item">
+   <div class="color-swatch" style="background:${v}" onclick="document.getElementById('cpick-${k.replace('--','')}').click()">
+    <input type="color" class="cpick" id="cpick-${k.replace('--','')}" value="${v}" oninput="syncColor('${k}',this.value)">
+   </div>
+   <label>${COLOR_LABELS[k]||k}</label>
+   <input class="color-hex" id="chex-${k.replace('--','')}" value="${v}" onchange="syncColor('${k}',this.value)">
+  </div>`).join('');
+}
+function syncColor(k,v){
+  D.colors[k]=v;
+  const hex=document.getElementById('chex-'+k.replace('--',''));if(hex)hex.value=v;
+  const pick=document.getElementById('cpick-'+k.replace('--',''));if(pick)pick.value=v;
+  const sw=document.querySelector(`[id="cpick-${k.replace('--','')}"]`)?.parentElement;if(sw)sw.style.background=v;
+}
+function resetColors(){D.colors=JSON.parse(JSON.stringify(DEF.colors));renderColorGrid();showToast('↺ تم استعادة الألوان الافتراضية')}
+
+// ════════════════════════════════
+// ANALYTICS
+// ════════════════════════════════
+const PAGE_NAMES={home:'الرئيسية',about:'من نحن',services:'الخدمات',cosmetic:'تجميل الأسنان',implants2:'زراعة الأسنان',implants:'تركيب الاسنان',nerve:'حشو العصب',ortho:'تقويم الاسنان',fillings:'الحشوات التجميلية',gum:'تجميل اللثة',kids:'اسنان الأطفال',contact:'تواصل معنا'};
+function getStats(){return JSON.parse(localStorage.getItem('alarrab_stats')||'{}')}
+function refreshStats(){
+  const s=getStats();
+  const total=s.total||0;
+  const pv=s.pageviews||{};
+  const cl=s.clicks||{};
+  const daily=s.daily||{};
+  // Update last time
+  document.getElementById('last-update').textContent=new Date().toLocaleString('ar-EG');
+  // KPIs
+  const totalClicks=(cl.phone||0)+(cl.whatsapp||0)+(cl.email||0)+(cl.map||0);
+  const todayKey=new Date().toISOString().split('T')[0];
+  const todayData=daily[todayKey]||{views:0,phone:0,whatsapp:0};
+  document.getElementById('kpi-grid').innerHTML=`
+  <div class="kpi kpi-gold"><h4>إجمالي الزيارات</h4><div class="kpi-val">${total}</div><div class="kpi-lbl">منذ البداية</div></div>
+  <div class="kpi kpi-green"><h4>زيارات اليوم</h4><div class="kpi-val">${todayData.views}</div><div class="kpi-lbl">اليوم فقط</div></div>
+  <div class="kpi kpi-blue"><h4>نقرات واتساب</h4><div class="kpi-val">${cl.whatsapp||0}</div><div class="kpi-lbl">إجمالي النقرات</div></div>
+  <div class="kpi kpi-orange"><h4>نقرات الهاتف</h4><div class="kpi-val">${cl.phone||0}</div><div class="kpi-lbl">إجمالي النقرات</div></div>
+  <div class="kpi kpi-red"><h4>إجمالي التفاعل</h4><div class="kpi-val">${totalClicks}</div><div class="kpi-lbl">كل نقرات التواصل</div></div>
+  <div class="kpi kpi-gold"><h4>صفحات مُزارة</h4><div class="kpi-val">${Object.keys(pv).length}</div><div class="kpi-lbl">من أصل 12</div></div>`;
+  // Daily charts
+  const last7=getLast7Days();
+  const maxView=Math.max(...last7.map(d=>(daily[d]||{}).views||0),1);
+  const maxCont=Math.max(...last7.map(d=>{const dd=daily[d]||{};return (dd.phone||0)+(dd.whatsapp||0)}),1);
+  document.getElementById('daily-chart').innerHTML=last7.map(d=>{
+    const dd=daily[d]||{};const v=dd.views||0;const h=Math.max(Math.round((v/maxView)*100),2);
+    const label=d.split('-').slice(1).join('/');
+    return `<div class="bar-col"><div class="bar bar-views" style="height:${h}%" data-val="${v}"></div><div class="bar-lbl">${label}</div></div>`;
+  }).join('');
+  document.getElementById('contact-chart').innerHTML=last7.map(d=>{
+    const dd=daily[d]||{};const ph=dd.phone||0;const wa=dd.whatsapp||0;const tot=ph+wa;
+    const h=Math.max(Math.round((tot/maxCont)*100),2);const label=d.split('-').slice(1).join('/');
+    return `<div class="bar-col"><div class="bar bar-wa" style="height:${h}%" data-val="📞${ph} 💬${wa}"></div><div class="bar-lbl">${label}</div></div>`;
+  }).join('');
+  // Pages table
+  document.getElementById('total-badge').textContent=total+' زيارة';
+  const sorted=Object.entries(pv).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('pages-tbody').innerHTML=sorted.map(([p,v])=>{
+    const pct=total?Math.round((v/total)*100):0;
+    return `<tr><td><strong>${PAGE_NAMES[p]||p}</strong></td><td><span class="badge-num badge-gold">${v}</span></td><td>${pct}%</td><td><div class="pg-bar"><div class="pg-bar-fill" style="width:${pct}%"></div></div></td></tr>`;
+  }).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--soft);padding:20px">لا توجد بيانات بعد — قم بزيارة الموقع أولاً</td></tr>';
+  // Click events
+  document.getElementById('evt-list').innerHTML=`
+  <div class="evt-row"><div class="evt-icon">💬</div><div class="evt-info"><div class="evt-label">نقرات واتساب</div><div class="evt-sub">من Hero، Footer، الخدمات، الأزرار العائمة</div></div><div style="text-align:left"><div class="evt-count">${cl.whatsapp||0}</div><div class="evt-pct">${totalClicks?Math.round(((cl.whatsapp||0)/totalClicks)*100):0}% من التفاعل</div></div></div>
+  <div class="evt-row"><div class="evt-icon">📞</div><div class="evt-info"><div class="evt-label">نقرات رقم الهاتف</div><div class="evt-sub">من Header، صفحة التواصل، الأزرار العائمة</div></div><div style="text-align:left"><div class="evt-count">${cl.phone||0}</div><div class="evt-pct">${totalClicks?Math.round(((cl.phone||0)/totalClicks)*100):0}% من التفاعل</div></div></div>
+  <div class="evt-row"><div class="evt-icon">✉️</div><div class="evt-info"><div class="evt-label">نقرات البريد الإلكتروني</div><div class="evt-sub">من صفحة التواصل</div></div><div style="text-align:left"><div class="evt-count">${cl.email||0}</div><div class="evt-pct">${totalClicks?Math.round(((cl.email||0)/totalClicks)*100):0}% من التفاعل</div></div></div>
+  <div class="evt-row"><div class="evt-icon">📍</div><div class="evt-info"><div class="evt-label">نقرات الخريطة</div><div class="evt-sub">من صفحة التواصل والعنوان</div></div><div style="text-align:left"><div class="evt-count">${cl.map||0}</div><div class="evt-pct">${totalClicks?Math.round(((cl.map||0)/totalClicks)*100):0}% من التفاعل</div></div></div>
+  <div class="evt-row" style="border-color:rgba(201,168,76,.3)"><div class="evt-icon">📊</div><div class="evt-info"><div class="evt-label">إجمالي أحداث التفاعل</div><div class="evt-sub">مجموع كل النقرات على أزرار التواصل</div></div><div style="text-align:left"><div class="evt-count" style="color:var(--gold)">${totalClicks}</div><div class="evt-pct">100%</div></div></div>`;
+}
+function getLast7Days(){
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+  return days;
+}
+function resetStats(){
+  if(confirm('هل تريد مسح جميع الإحصائيات؟ لا يمكن التراجع عن هذا.')){
+    localStorage.removeItem('alarrab_stats');
+    refreshStats();
+    showToast('✓ تم مسح الإحصائيات');
+  }
+}
+
+// ════════════════════════════════
+// SAVE
+// ════════════════════════════════
+function saveAll(){
+  // Collect form values
+  D.clinic.name=getVal('c-name');D.clinic.nameEn=getVal('c-nameen');
+  D.clinic.phone=getVal('c-phone');D.clinic.email=getVal('c-email');
+  D.clinic.whatsapp=getVal('c-wa');D.clinic.address=getVal('c-addr');
+  D.clinic.mapUrl=getVal('c-map');D.clinic.logoSrc=getVal('c-logo-src');
+  D.hero={title:getVal('hero-title'),desc:getVal('hero-desc'),img:getVal('hero-img-src')};
+  D.whyImg=getVal('why-img-src');
+  D.whyDesc=getVal('why-desc');
+  D.about={img:getVal('about-img-src'),missionText:getVal('mission-txt')};
+  // Service images from grid
+  D.services.forEach(s=>{const si=document.getElementById('svc-img-src-'+s.id);if(si)s.img=si.value});
+  // Colors
+  applyColors();
+  // Save
+  localStorage.setItem('alarrab_sitedata',JSON.stringify(D));
+  showToast('✓ تم حفظ جميع التغييرات بنجاح');
+}
+function applyColors(){
+  const root=document.documentElement;
+  Object.entries(D.colors).forEach(([k,v])=>root.style.setProperty(k,v));
+}
+applyColors();
+
+// ════════════════════════════════
+// HELPERS
+// ════════════════════════════════
+function toggleAcc(id){const el=document.getElementById(id);el.classList.toggle('open')}
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast toast-'+(type==='err'?'err':'ok')+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
